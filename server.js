@@ -50,17 +50,34 @@ function createSlug(text) {
 
 // --- API ENDPOINTS ---
 
-// 1. Settings
+// 1. Settings & Admin Auth
 app.get('/api/settings', (req, res) => {
   const data = readData();
-  res.json(data.settings || {});
+  const safeSettings = { ...(data.settings || {}) };
+  delete safeSettings.adminPassword; // Don't expose password to public
+  res.json(safeSettings);
+});
+
+// Admin Login Check
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  const data = readData();
+  const currentPassword = (data.settings && data.settings.adminPassword) || 'reef2026';
+
+  if (password === currentPassword) {
+    res.json({ success: true, token: 'reef_authenticated_' + Date.now() });
+  } else {
+    res.status(401).json({ success: false, error: 'كلمة المرور غير صحيحة' });
+  }
 });
 
 app.put('/api/settings', (req, res) => {
   const data = readData();
   data.settings = { ...data.settings, ...req.body };
   writeData(data);
-  res.json({ success: true, settings: data.settings });
+  const safeSettings = { ...data.settings };
+  delete safeSettings.adminPassword;
+  res.json({ success: true, settings: safeSettings });
 });
 
 // 2. Categories
@@ -303,10 +320,26 @@ app.patch('/api/orders/:id/status', (req, res) => {
     return res.status(404).json({ error: 'الطلب غير موجود' });
   }
 
+  const previousStatus = order.status;
   order.status = status;
   order.updatedAt = new Date().toISOString();
-  writeData(data);
 
+  // Dynamic Stock Management:
+  // If an order is cancelled, return the reserved items to stock
+  if (status === 'cancelled' && previousStatus !== 'cancelled') {
+    const product = data.products.find(p => p.id === order.productId);
+    if (product) {
+      product.stock = (product.stock || 0) + (order.quantity || 1);
+    }
+  } else if (previousStatus === 'cancelled' && status !== 'cancelled') {
+    // If order was cancelled and now re-activated/confirmed, deduct stock again
+    const product = data.products.find(p => p.id === order.productId);
+    if (product) {
+      product.stock = Math.max(0, (product.stock || 0) - (order.quantity || 1));
+    }
+  }
+
+  writeData(data);
   res.json({ success: true, order });
 });
 

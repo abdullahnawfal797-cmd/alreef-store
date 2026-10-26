@@ -474,8 +474,9 @@ async function loadSettings() {
 
     document.getElementById('settingStoreName').value = currentSettings.storeName || '';
     document.getElementById('settingWhatsapp').value = currentSettings.whatsappNumber || '';
-    document.getElementById('settingCurrency').value = currentSettings.currency || 'ريال';
+    document.getElementById('settingCurrency').value = currentSettings.currency || 'د.ع';
     document.getElementById('settingAnnouncement').value = currentSettings.announcement || '';
+    document.getElementById('settingAdminPassword').value = '';
   } catch (err) {
     console.error('Error loading settings:', err);
   }
@@ -490,6 +491,11 @@ async function saveSettings(e) {
     announcement: document.getElementById('settingAnnouncement').value.trim()
   };
 
+  const newPass = document.getElementById('settingAdminPassword').value.trim();
+  if (newPass) {
+    payload.adminPassword = newPass;
+  }
+
   try {
     const res = await fetch('/api/settings', {
       method: 'PUT',
@@ -499,13 +505,73 @@ async function saveSettings(e) {
     if (!res.ok) throw new Error('فشل حفظ الإعدادات');
     currentSettings = payload;
     showToast('تم حفظ إعدادات المتجر بنجاح!', '💾');
+    document.getElementById('settingAdminPassword').value = '';
     loadDashboardStats();
   } catch (err) {
     alert('خطأ: ' + err.message);
   }
 }
 
-// Initial Load
+// 6. Admin Authentication Handlers
+function checkAdminAuth() {
+  const token = sessionStorage.getItem('reef_admin_auth');
+  const overlay = document.getElementById('adminLoginOverlay');
+  if (token) {
+    if (overlay) overlay.classList.remove('active');
+    loadProducts();
+  } else {
+    if (overlay) overlay.classList.add('active');
+    setTimeout(() => {
+      const passInput = document.getElementById('adminLoginPass');
+      if (passInput) passInput.focus();
+    }, 200);
+  }
+}
+
+async function handleAdminLogin(e) {
+  e.preventDefault();
+  const pass = document.getElementById('adminLoginPass').value.trim();
+  const errEl = document.getElementById('loginErrorMsg');
+  const btn = document.getElementById('btnLoginSubmit');
+  
+  btn.disabled = true;
+  btn.innerText = 'جاري التحقق... ⏳';
+  errEl.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pass })
+    });
+    const result = await res.json();
+    if (!res.ok || !result.success) {
+      throw new Error(result.error || 'كلمة المرور غير صحيحة');
+    }
+
+    sessionStorage.setItem('reef_admin_auth', result.token);
+    document.getElementById('adminLoginOverlay').classList.remove('active');
+    document.getElementById('adminLoginForm').reset();
+    showToast('مرحباً بك! تم الدخول إلى لوحة إدارة الريف ستور 🌿', '🔓');
+    loadProducts();
+  } catch (err) {
+    errEl.innerText = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'فتح لوحة التحكم 🔐';
+  }
+}
+
+function logoutAdmin() {
+  if (confirm('هل تريد قفل لوحة التحكم وتسجيل الخروج؟')) {
+    sessionStorage.removeItem('reef_admin_auth');
+    document.getElementById('adminLoginOverlay').classList.add('active');
+    showToast('تم قفل لوحة التحكم بنجاح', '🔒');
+  }
+}
+
+// Initial Load with Authentication Check
 document.addEventListener('DOMContentLoaded', () => {
-  loadProducts();
+  checkAdminAuth();
 });

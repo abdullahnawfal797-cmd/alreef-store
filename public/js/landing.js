@@ -75,8 +75,30 @@ function renderProductUI() {
   }
 
   const stockEl = document.getElementById('lpStock');
-  if (stockEl) {
-    stockEl.innerText = p.stock > 0 ? `متبقي في المخزون ${p.stock} قطعة فقط ⚠️` : 'الكمية محدودة جداً!';
+  const submitBtn = document.getElementById('lpSubmitBtn');
+  const stickyBtn = document.querySelector('.lp-sticky-btn');
+
+  if (p.stock <= 0) {
+    if (stockEl) {
+      stockEl.innerText = 'عذراً، نفدت الكمية بالكامل ❌';
+      stockEl.style.color = '#e11d48';
+      stockEl.style.background = '#ffe4e6';
+    }
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.style.background = '#94a3b8';
+      submitBtn.style.animation = 'none';
+      submitBtn.style.cursor = 'not-allowed';
+      submitBtn.innerHTML = '<span>عذراً، نفدت الكمية حالياً ❌</span>';
+    }
+    if (stickyBtn) {
+      stickyBtn.disabled = true;
+      stickyBtn.style.background = '#94a3b8';
+      stickyBtn.style.cursor = 'not-allowed';
+      stickyBtn.innerText = 'نفدت الكمية ❌';
+    }
+  } else if (stockEl) {
+    stockEl.innerText = `متبقي في المخزون ${p.stock} قطعة فقط ⚠️`;
   }
 
   // Title & Rating

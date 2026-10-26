@@ -6,7 +6,8 @@
     "announcement": "🌿 عروض الريف ستور الحصرية: توصيل سريع لكافة محافظات العراق (صلاح الدين، بغداد، وكافة المدن) + فحص المنتج والمعاينة قبل الدفع!",
     "enableDirectWhatsapp": true,
     "enableCodForm": true,
-    "logoUrl": "/images/logo.png"
+    "logoUrl": "/images/logo.png",
+    "adminPassword": "reef2026"
   },
   "categories": [
     "الكل",
