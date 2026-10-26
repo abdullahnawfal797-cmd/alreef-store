@@ -13,7 +13,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <a href="/" class="brand-logo">
-        <img src="/images/logo.png" alt="شعار الريف ستور" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1.5px solid rgba(223, 168, 65, 0.5); box-shadow: 0 4px 12px rgba(12, 35, 64, 0.15);" />
+        <img src="/images/logo.png" alt="شعار الريف ستور" style="width: 48px; height: 48px; border-radius: 14px; object-fit: contain; background: #ffffff; padding: 2px; border: 2px solid #dfa841; box-shadow: 0 4px 14px rgba(12, 35, 64, 0.2);" />
         <span id="navStoreName">الريف ستور | Al-Reef Store</span>
       </a>
       <nav class="nav-links">
@@ -55,6 +55,22 @@
       </div>
     </div>
   </main>
+
+  <!-- Agency Software House Branding & Marketing Badge -->
+  <div class="container" style="margin-top: 50px; margin-bottom: 40px;">
+    <div class="agency-footer-badge">
+      <div class="agency-footer-title">
+        <span style="color: #dfa841;">⚡</span>
+        <span>تصميم وتطوير وبرمجة حصرية بواسطة: <strong>الريف للحلول البرمجية المتكاملة | Al-Reef Soft</strong></span>
+      </div>
+      <p class="agency-footer-sub">
+        نوفر خدمات برمجة المتاجر الإلكترونية، صفحات الهبوط فائقة التحويل (Landing Pages)، وأنظمة ERP المتكاملة للمؤسسات والشركات.
+      </p>
+      <a href="https://wa.me/9647723457175?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%20%D9%81%D8%B1%D9%8A%D9%82%20%D8%A7%D9%84%D8%B1%D9%8A%D9%81%20%D8%B3%D9%88%D9%81%D8%AA%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%20%D8%A7%D9%84%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D8%A7%D9%84%D8%A8%D8%B1%D9%85%D8%AC%D9%8A%20%D9%88%D8%B5%D9%81%D8%AD%D8%A7%D8%AA%20%D8%A7%D9%84%D9%87%D8%A8%D9%88%D8%B7" target="_blank" class="agency-footer-btn">
+        <span>💬 اطلب برمجتك أو مشروعك الخاص عبر واتساب (07723457175)</span>
+      </a>
+    </div>
+  </div>
 
   <!-- Toast Notification -->
   <div class="toast-msg" id="toast">
@@ -149,9 +165,37 @@
 
       if (filtered.length === 0) {
         grid.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; background: #ffffff; border-radius: 20px; border: 1px dashed #cbd5e1; box-shadow: var(--shadow-card);">
-            <p style="font-size: 1.2rem; color: #475569; margin-bottom: 14px; font-weight: 700;">لا توجد منتجات معروضة في هذه الفئة حالياً</p>
-            <a href="/admin" class="nav-btn primary" style="display: inline-flex;">+ أضف منتجك الأول من لوحة التحكم</a>
+          <div style="grid-column: 1/-1; text-align: center; padding: 50px 24px; background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(20px); border-radius: 28px; border: 2px solid rgba(223, 168, 65, 0.4); box-shadow: 0 20px 50px rgba(12, 35, 64, 0.08); margin: 20px 0;">
+            <div style="display: inline-block; position: relative; margin-bottom: 20px;">
+              <img src="/images/logo.png" alt="شعار الريف ستور" style="width: 90px; height: 90px; border-radius: 26px; object-fit: contain; background: #ffffff; padding: 4px; border: 2.5px solid #dfa841; box-shadow: 0 12px 30px rgba(12, 35, 64, 0.2);" />
+            </div>
+            <h2 style="font-size: 1.85rem; font-weight: 900; color: #0c2340; margin-bottom: 12px;">
+              أهلاً بكم في متجر الريف ستور 🌿
+            </h2>
+            <p style="font-size: 1.05rem; color: #475569; max-width: 620px; margin: 0 auto 24px; line-height: 1.8; font-weight: 600;">
+              نحن بصدد تجهيز وإطلاق أحدث باقة من المنتجات الحصرية والعروض الترويجية المباشرة بأسعار الجملة. التوصيل متاح لكافة محافظات العراق (صلاح الدين، بغداد، وكافة المدن) مع المعاينة والفحص الكامل قبل دفع أي دينار!
+            </p>
+
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-bottom: 30px;">
+              <span style="background: rgba(27, 153, 99, 0.1); color: #047857; padding: 8px 18px; border-radius: 999px; font-weight: 800; font-size: 0.9rem; border: 1px solid rgba(27, 153, 99, 0.25);">
+                🇮🇶 توصيل سريع لكافة المحافظات
+              </span>
+              <span style="background: rgba(223, 168, 65, 0.15); color: #b45309; padding: 8px 18px; border-radius: 999px; font-weight: 800; font-size: 0.9rem; border: 1px solid rgba(223, 168, 65, 0.3);">
+                🔍 افحص وعاين المنتج قبل الدفع
+              </span>
+              <span style="background: rgba(12, 35, 64, 0.08); color: #0c2340; padding: 8px 18px; border-radius: 999px; font-weight: 800; font-size: 0.9rem; border: 1px solid rgba(12, 35, 64, 0.15);">
+                🛡️ ضمان استبدال واسترجاع حقيقي
+              </span>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;">
+              <a href="https://wa.me/9647723457175?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%20%D9%85%D8%AA%D8%AC%D8%B1%20%D8%A7%D9%84%D8%B1%D9%8A%D9%81%D8%8C%20%D8%A3%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%B7%D9%84%D8%A8%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%B9%D8%B1%D9%88%D8%B6" target="_blank" class="nav-btn primary" style="padding: 14px 28px; font-size: 1rem; background: linear-gradient(135deg, #1b9963, #127449); border: none; box-shadow: 0 4px 18px rgba(27, 153, 99, 0.3);">
+                <span>💬 تواصل معنا للطلبات الخاصة (07723457175)</span>
+              </a>
+              <a href="/admin" class="nav-btn outline" style="padding: 14px 24px; font-size: 0.95rem; border-color: rgba(12,35,64,0.3); color: #0c2340;">
+                <span>⚙️ لوحة الإدارة (+ إضافة منتجاتك)</span>
+              </a>
+            </div>
           </div>
         `;
         return;

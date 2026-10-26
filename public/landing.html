@@ -47,8 +47,9 @@
 
     <!-- Gallery Card -->
     <div class="lp-gallery-card">
-      <div class="lp-main-img-wrap">
+      <div class="lp-main-img-wrap" onclick="openLightbox()">
         <img id="lpMainImage" class="lp-main-img" src="" alt="صورة المنتج" />
+        <span class="lp-zoom-hint">🔍 انقر لتكبير الصورة</span>
       </div>
       <div class="lp-thumb-row" id="lpThumbRow">
         <!-- Thumbnails populated dynamically -->
@@ -193,6 +194,20 @@
       🔒 الدفع نقداً بالدينار العراقي عند استلام ومعاينة الشحنة • لا حاجة لأي بطاقة دفع إلكتروني
     </div>
 
+    <!-- Agency Software House Branding & Marketing Badge -->
+    <div class="agency-footer-badge" style="margin-top: 36px; background: rgba(255,255,255,0.85); backdrop-filter: blur(14px); border: 1.5px solid rgba(223, 168, 65, 0.4); border-radius: 22px; padding: 22px 20px; text-align: center; box-shadow: 0 10px 30px rgba(12,35,64,0.08);">
+      <div style="font-size: 1rem; font-weight: 900; color: #0c2340; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span style="color: #dfa841;">⚡</span>
+        <span>تصميم وهندسة برمجية بواسطة: <strong>الريف للحلول البرمجية المتكاملة</strong></span>
+      </div>
+      <p style="font-size: 0.85rem; color: #475569; margin-bottom: 14px; line-height: 1.6;">
+        هل تمتلك متجراً أو منتجاً وترغب بتصميم صفحة هبوط فائقة السرعة أو نظام برمجي متكامل خاص بأعمالك؟
+      </p>
+      <a href="https://wa.me/9647723457175?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%D9%83%D9%85%20%D8%A7%D9%84%D8%A8%D8%B1%D9%85%D8%AC%D9%8A%D8%A9%20%D9%88%D8%AA%D8%B5%D9%85%D9%8A%D9%85%20%D8%B5%D9%81%D8%AD%D8%A7%D8%AA%20%D8%A7%D9%84%D9%87%D8%A8%D9%88%D8%B7" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #0c2340, #16406f); color: #dfa841; padding: 10px 24px; border-radius: 999px; font-size: 0.88rem; font-weight: 800; text-decoration: none; border: 1px solid rgba(223, 168, 65, 0.4); box-shadow: 0 4px 18px rgba(12,35,64,0.18);">
+        <span>💬 اطلب برمجتك أو متجرك الخاص عبر واتساب (07723457175)</span>
+      </a>
+    </div>
+
   </div>
 
   <!-- Sticky Bottom Purchase Bar (for mobile visitors scrolling) -->
@@ -204,6 +219,14 @@
     <button class="lp-sticky-btn" onclick="scrollToOrderForm()">
       اطلب الآن (الدفع عند الاستلام) 🛍️
     </button>
+  </div>
+
+  <!-- Image HD Lightbox Modal -->
+  <div class="lp-modal" id="lpImageLightbox" onclick="closeLightbox(event)" style="background: rgba(7, 21, 38, 0.92); backdrop-filter: blur(12px); cursor: zoom-out;">
+    <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
+      <button type="button" onclick="closeLightbox(event)" style="position: absolute; top: -45px; right: 0; background: rgba(255,255,255,0.2); color: #fff; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+      <img id="lightboxImg" src="" alt="صورة المنتج بجودة عالية" style="max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,0.6);" />
+    </div>
   </div>
 
   <!-- Order Success Modal -->

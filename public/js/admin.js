@@ -35,7 +35,7 @@ async function loadDashboardStats() {
   try {
     const res = await fetch('/api/stats');
     const data = await res.json();
-    const currency = data.currency || 'ريال';
+    const currency = data.currency || 'د.ع';
 
     document.getElementById('statProducts').innerText = data.totalProducts;
     document.getElementById('statActiveProducts').innerText = `${data.activeProducts} بوابة نشطة حالياً`;
@@ -92,13 +92,22 @@ function populateCategorySelectors(categories) {
 
 function renderProductsTable(products) {
   const tbody = document.getElementById('productsTableBody');
-  const currency = currentSettings.currency || 'ريال';
+  const currency = currentSettings.currency || 'د.ع';
 
   if (!products || products.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9" style="text-align: center; padding: 40px; color: #94a3b8;">
-          لا توجد بوابات منتجات مسجلة. اضغط على "+ إضافة بوابة منتج جديدة" للبدء فوراً!
+        <td colspan="9" style="text-align: center; padding: 50px 20px; color: #475569;">
+          <div style="font-size: 2.2rem; margin-bottom: 10px;">📦 ✨</div>
+          <div style="font-size: 1.15rem; font-weight: 900; color: #0c2340; margin-bottom: 6px;">
+            متجرك جاهز ومُصفّر بالكامل بانتظار منتجاتك الحقيقية الأولى!
+          </div>
+          <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 18px;">
+            ارفع صورك مباشرة من هاتفك أو حاسوبك، وحدد السعر بالدينار العراقي، وابدأ البيع فوراً.
+          </p>
+          <button type="button" class="nav-btn primary" onclick="openProductModal()" style="display: inline-flex; margin: 0 auto;">
+            + اضغط هنا لإضافة أول بوابة منتج الآن 🚀
+          </button>
         </td>
       </tr>
     `;
@@ -188,6 +197,155 @@ function copyLandingLink(slug) {
   });
 }
 
+// Image Upload and Gallery Management State
+let currentGalleryImages = [];
+
+function toggleMainUrlInput() {
+  const wrap = document.getElementById('mainUrlWrap');
+  if (wrap) {
+    wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+function handleManualImageUrl(url) {
+  if (!url || !url.trim()) return;
+  setMainImage(url.trim(), '✓ تم استخدام الرابط الخارجي');
+}
+
+function setMainImage(imgUrl, info = '') {
+  document.getElementById('prodImage').value = imgUrl;
+  const img = document.getElementById('mainImagePreviewImg');
+  if (img) img.src = imgUrl;
+  const dropzone = document.getElementById('mainImageDropzone');
+  const previewBox = document.getElementById('mainImagePreviewBox');
+  if (dropzone) dropzone.style.display = 'none';
+  if (previewBox) previewBox.style.display = 'block';
+  if (info) {
+    const infoEl = document.getElementById('mainImageInfo');
+    if (infoEl) infoEl.innerText = info;
+  }
+}
+
+function removeMainImage() {
+  document.getElementById('prodImage').value = '';
+  const fileInput = document.getElementById('prodMainFileInput');
+  if (fileInput) fileInput.value = '';
+  const urlInput = document.getElementById('prodImageUrlInput');
+  if (urlInput) urlInput.value = '';
+  const img = document.getElementById('mainImagePreviewImg');
+  if (img) img.src = '';
+  const dropzone = document.getElementById('mainImageDropzone');
+  const previewBox = document.getElementById('mainImagePreviewBox');
+  if (dropzone) dropzone.style.display = 'block';
+  if (previewBox) previewBox.style.display = 'none';
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  const dz = document.getElementById('mainImageDropzone');
+  if (dz) dz.classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+  e.preventDefault();
+  const dz = document.getElementById('mainImageDropzone');
+  if (dz) dz.classList.remove('dragover');
+}
+
+function handleMainImageDrop(e) {
+  e.preventDefault();
+  const dz = document.getElementById('mainImageDropzone');
+  if (dz) dz.classList.remove('dragover');
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+    uploadAndSetMainFile(e.dataTransfer.files[0]);
+  }
+}
+
+function handleMainImageUpload(input) {
+  if (input.files && input.files[0]) {
+    uploadAndSetMainFile(input.files[0]);
+  }
+}
+
+async function uploadAndSetMainFile(file) {
+  if (!file.type.startsWith('image/')) {
+    alert('يرجى اختيار ملف صورة صالح (PNG, JPG, WebP, GIF)');
+    return;
+  }
+  showToast('جاري رفع ومعالجة صورة المنتج من جهازك... ⏳');
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64Data = e.target.result;
+    setMainImage(base64Data, '✓ جاري المعالجة بالحجم الطبيعي...');
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64Data, filename: file.name })
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        setMainImage(data.url, `✓ تم حفظ الصورة بنجاح (${file.name})`);
+        showToast('تم حفظ الصورة بنجاح!', '✅');
+      }
+    } catch (err) {
+      console.warn('Fallback to base64 data:', err);
+      setMainImage(base64Data, '✓ تم تحميل الصورة');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// Gallery Upload and Rendering
+function handleGalleryUpload(input) {
+  if (!input.files || input.files.length === 0) return;
+  const files = Array.from(input.files);
+  showToast(`جاري رفع ${files.length} صور للمعرض... ⏳`);
+
+  files.forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64Data = e.target.result;
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64Data, filename: file.name })
+        });
+        const data = await res.json();
+        const urlToAdd = (data.success && data.url) ? data.url : base64Data;
+        currentGalleryImages.push(urlToAdd);
+        renderGalleryPreviews();
+      } catch (err) {
+        currentGalleryImages.push(base64Data);
+        renderGalleryPreviews();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderGalleryPreviews() {
+  const grid = document.getElementById('galleryPreviewGrid');
+  if (!grid) return;
+  grid.innerHTML = currentGalleryImages.map((url, idx) => `
+    <div class="gallery-upload-item">
+      <img src="${url}" alt="صورة المعرض ${idx + 1}" />
+      <button type="button" class="gallery-upload-del-btn" onclick="removeGalleryImage(${idx})" title="حذف">✕</button>
+    </div>
+  `).join('');
+  const storage = document.getElementById('prodGallery');
+  if (storage) storage.value = currentGalleryImages.join('\n');
+}
+
+function removeGalleryImage(idx) {
+  currentGalleryImages.splice(idx, 1);
+  renderGalleryPreviews();
+}
+
 // 3. Add / Edit Product Modal
 function openProductModal(product = null) {
   const modal = document.getElementById('productModal');
@@ -208,8 +366,20 @@ function openProductModal(product = null) {
     document.getElementById('prodSupplierCost').value = product.supplierCost || '';
     document.getElementById('prodStock').value = product.stock;
     document.getElementById('prodBadge').value = product.badge || '';
-    document.getElementById('prodImage').value = product.image;
-    document.getElementById('prodGallery').value = (product.gallery || []).join('\n');
+
+    // Populate Main Image
+    if (product.image) {
+      setMainImage(product.image, '✓ الصورة الحالية');
+    } else {
+      removeMainImage();
+    }
+
+    // Populate Gallery Images
+    currentGalleryImages = Array.isArray(product.gallery) && product.gallery.length > 0 
+      ? [...product.gallery] 
+      : (product.image ? [product.image] : []);
+    renderGalleryPreviews();
+
     document.getElementById('prodBrief').value = product.brief || '';
     document.getElementById('prodFeatures').value = (product.features || []).join('\n');
     document.getElementById('prodActive').checked = product.active !== false;
@@ -219,6 +389,9 @@ function openProductModal(product = null) {
     document.getElementById('prodEditId').value = '';
     document.getElementById('prodActive').checked = true;
     document.getElementById('prodStock').value = 50;
+    removeMainImage();
+    currentGalleryImages = [];
+    renderGalleryPreviews();
   }
 
   modal.classList.add('active');
@@ -231,7 +404,7 @@ function closeProductModal() {
 function calculateMarginPreview() {
   const price = parseFloat(document.getElementById('prodPrice').value) || 0;
   const cost = parseFloat(document.getElementById('prodSupplierCost').value) || 0;
-  const currency = currentSettings.currency || 'ريال';
+  const currency = currentSettings.currency || 'د.ع';
   const preview = document.getElementById('marginPreview');
 
   if (price > 0 && cost > 0) {
@@ -253,18 +426,21 @@ async function saveProduct(e) {
   btn.disabled = true;
 
   const id = document.getElementById('prodEditId').value;
-  const galleryText = document.getElementById('prodGallery').value;
+  const mainImage = document.getElementById('prodImage').value.trim();
+  
+  if (!mainImage) {
+    alert('يرجى اختيار صورة رئيسية للمنتج من جهازك أولاً (أو إدخال رابط صورة).');
+    btn.disabled = false;
+    return;
+  }
+
   const featuresText = document.getElementById('prodFeatures').value;
-
-  const gallery = galleryText
-    .split(/[\n,]/)
-    .map(s => s.trim())
-    .filter(s => s.length > 5);
-
   const features = featuresText
     .split('\n')
     .map(s => s.trim())
     .filter(s => s.length > 0);
+
+  const gallery = currentGalleryImages.length > 0 ? currentGalleryImages : [mainImage];
 
   const payload = {
     title: document.getElementById('prodTitle').value.trim(),
@@ -275,7 +451,7 @@ async function saveProduct(e) {
     supplierCost: parseFloat(document.getElementById('prodSupplierCost').value) || 0,
     stock: parseInt(document.getElementById('prodStock').value, 10) || 0,
     badge: document.getElementById('prodBadge').value.trim(),
-    image: document.getElementById('prodImage').value.trim(),
+    image: mainImage,
     gallery,
     brief: document.getElementById('prodBrief').value.trim(),
     features,
@@ -446,7 +622,7 @@ function exportOrdersToCSV() {
     `"${(o.productTitle || '').replace(/"/g, '""')}"`,
     o.quantity,
     o.totalAmount,
-    `"${o.currency || 'ريال'}"`,
+    `"${o.currency || 'د.ع'}"`,
     `"${(o.customerName || '').replace(/"/g, '""')}"`,
     `"${o.customerPhone}"`,
     `"${(o.customerCity || '').replace(/"/g, '""')}"`,

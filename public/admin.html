@@ -12,7 +12,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand-logo">
-        <img src="/images/logo.png" alt="شعار الريف ستور" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1.5px solid rgba(223, 168, 65, 0.5); box-shadow: 0 4px 12px rgba(12, 35, 64, 0.15);" />
+        <img src="/images/logo.png" alt="شعار الريف ستور" style="width: 48px; height: 48px; border-radius: 14px; object-fit: contain; background: #ffffff; padding: 2px; border: 2px solid #dfa841; box-shadow: 0 4px 14px rgba(12, 35, 64, 0.2);" />
         <span>لوحة إدارة الريف ستور</span>
       </div>
       <nav class="nav-links">
@@ -204,7 +204,7 @@
   <!-- ADMIN PASSWORD LOGIN OVERLAY -->
   <div class="modal-overlay active" id="adminLoginOverlay" style="background: rgba(12, 35, 64, 0.85); backdrop-filter: blur(20px); z-index: 9999;">
     <div class="modal-box" style="max-width: 420px; text-align: center; border: 2px solid #1b9963; box-shadow: 0 25px 60px rgba(0,0,0,0.5);">
-      <img src="/images/logo.png" alt="شعار الريف ستور" style="width: 70px; height: 70px; border-radius: 18px; margin: 0 auto 16px; object-fit: cover; border: 2px solid #dfa841; box-shadow: 0 6px 20px rgba(0,0,0,0.25);" />
+      <img src="/images/logo.png" alt="شعار الريف ستور" style="width: 80px; height: 80px; border-radius: 22px; margin: 0 auto 16px; object-fit: contain; background: #ffffff; padding: 4px; border: 2.5px solid #dfa841; box-shadow: 0 8px 25px rgba(0,0,0,0.25);" />
       <h2 style="font-size: 1.5rem; font-weight: 900; color: #0c2340; margin-bottom: 8px;">لوحة تحكم الريف ستور</h2>
       <p style="color: #64748b; font-size: 0.92rem; margin-bottom: 24px; font-weight: 600;">
         هذه الصفحة مخصصة لمدير المتجر فقط. أدخل كلمة المرور السرية للدخول.
@@ -279,14 +279,76 @@
           <input type="text" id="prodBadge" class="form-input" placeholder="مثال: الأكثر مبيعاً على تيك توك 🔥 أو خصم 50%" />
         </div>
 
+        <!-- Main Product Image (Direct Device Upload) -->
         <div class="form-group">
-          <label class="form-label">رابط الصورة الرئيسية للمنتج *</label>
-          <input type="url" id="prodImage" class="form-input" placeholder="https://images.unsplash.com/..." required />
+          <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>📸 الصورة الرئيسية للمنتج (رفع مباشر من جهازك) *</span>
+            <small style="color: #1b9963; font-weight: 800;">بأي حجم ومقاس تريده</small>
+          </label>
+
+          <!-- Hidden File Input & Value -->
+          <input type="file" id="prodMainFileInput" accept="image/*" style="display: none;" onchange="handleMainImageUpload(this)" />
+          <input type="hidden" id="prodImage" required />
+
+          <!-- Dropzone -->
+          <div class="upload-dropzone" id="mainImageDropzone" onclick="document.getElementById('prodMainFileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleMainImageDrop(event)">
+            <div class="upload-dropzone-icon">📷</div>
+            <div class="upload-dropzone-title">اضغط هنا لاختيار صورة المنتج من هاتفك أو حاسوبك</div>
+            <div class="upload-dropzone-sub">أو اسحب الصورة وأفلتها هنا • تدعم أي مقاس (PNG, JPG, WebP) بالحجم الطبيعي بدون أي قص</div>
+          </div>
+
+          <!-- Preview Box (Shown when an image is loaded) -->
+          <div class="upload-preview-container" id="mainImagePreviewBox" style="display: none;">
+            <div class="upload-preview-img-wrap">
+              <img id="mainImagePreviewImg" class="upload-preview-img" src="" alt="معاينة الصورة الرئيسية" />
+            </div>
+            <div class="upload-preview-actions">
+              <span class="upload-preview-info" id="mainImageInfo">✓ تم تجهيز الصورة بالحجم الطبيعي الكامل</span>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn-upload-action btn-upload-change" onclick="document.getElementById('prodMainFileInput').click()">
+                  🔄 تغيير الصورة
+                </button>
+                <button type="button" class="btn-upload-action btn-upload-remove" onclick="removeMainImage()">
+                  🗑️ حذف
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Optional URL fallback for advanced use -->
+          <div style="margin-top: 8px;">
+            <button type="button" onclick="toggleMainUrlInput()" style="background: none; border: none; color: #64748b; font-size: 0.8rem; font-weight: 700; cursor: pointer; text-decoration: underline;">
+              🔗 أو استخدام رابط صورة خارجي (اختياري)
+            </button>
+            <div id="mainUrlWrap" style="display: none; margin-top: 6px;">
+              <input type="url" id="prodImageUrlInput" class="form-input" placeholder="https://example.com/image.jpg" oninput="handleManualImageUrl(this.value)" style="font-size: 0.85rem; padding: 8px 12px;" />
+            </div>
+          </div>
         </div>
 
+        <!-- Additional Gallery Images (Direct Device Upload) -->
         <div class="form-group">
-          <label class="form-label">روابط صور إضافية للمعرض (مفصولة بفواصل أو أسطر)</label>
-          <textarea id="prodGallery" class="form-textarea" rows="2" placeholder="https://image1.jpg, https://image2.jpg"></textarea>
+          <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>🖼️ صور إضافية لمعرض المنتج (اختياري)</span>
+            <small style="color: #64748b;">اختر صورة أو عدة صور معاً من جهازك</small>
+          </label>
+
+          <!-- Hidden Gallery Multi-file input -->
+          <input type="file" id="prodGalleryFileInput" accept="image/*" multiple style="display: none;" onchange="handleGalleryUpload(this)" />
+          
+          <div class="upload-dropzone" style="padding: 16px;" onclick="document.getElementById('prodGalleryFileInput').click()">
+            <div style="font-size: 1.5rem; color: #dfa841;">➕ 📸</div>
+            <div style="font-weight: 800; font-size: 0.92rem; color: #0c2340;">اضغط هنا لإضافة صور للمعرض من جهازك</div>
+            <div style="font-size: 0.8rem; color: #64748b;">يمكنك تحديد أكثر من صورة من الهاتف أو الحاسوب دفعة واحدة</div>
+          </div>
+
+          <!-- Dynamic Gallery Grid -->
+          <div class="gallery-upload-grid" id="galleryPreviewGrid">
+            <!-- Thumbnails injected by JS -->
+          </div>
+
+          <!-- Hidden Gallery Storage -->
+          <textarea id="prodGallery" style="display: none;"></textarea>
         </div>
 
         <div class="form-group">

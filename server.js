@@ -6,9 +6,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data', 'store.json');
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Ensure uploads and data directories exist
+const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+const DATA_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+// Middleware with 50MB limit to support direct high-res device image uploads
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database helper functions
@@ -78,6 +88,81 @@ app.put('/api/settings', (req, res) => {
   const safeSettings = { ...data.settings };
   delete safeSettings.adminPassword;
   res.json({ success: true, settings: safeSettings });
+});
+
+// Image Upload Endpoint (Direct device photo upload - no external links required)
+app.post('/api/upload', (req, res) => {
+  try {
+    const { image, filename } = req.body;
+    if (!image) {
+      return res.status(400).json({ error: 'لم يتم إرسال أي صورة' });
+    }
+
+    // Check if it's a data URL
+    const matches = image.match(/^data:([A-Za-z0-9\-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      // If it's already an HTTP URL or local path, return it directly
+      return res.json({ success: true, url: image });
+    }
+
+    const mime = matches[1].toLowerCase();
+    let ext = 'png';
+    if (mime.includes('jpeg') || mime.includes('jpg')) ext = 'jpg';
+    else if (mime.includes('webp')) ext = 'webp';
+    else if (mime.includes('gif')) ext = 'gif';
+    else if (mime.includes('svg')) ext = 'svg';
+
+    const safeRandom = Math.random().toString(36).substring(2, 8);
+    const cleanFileName = `prod_${Date.now()}_${safeRandom}.${ext}`;
+    const filePath = path.join(UPLOADS_DIR, cleanFileName);
+
+    const buffer = Buffer.from(matches[2], 'base64');
+    fs.writeFileSync(filePath, buffer);
+
+    const fileUrl = `/uploads/${cleanFileName}`;
+    res.json({ success: true, url: fileUrl });
+  } catch (err) {
+    console.error('Image upload error:', err);
+    res.status(500).json({ error: 'فشل حفظ الصورة: ' + err.message });
+  }
+});
+
+// Multiple Images Upload Endpoint
+app.post('/api/upload-multiple', (req, res) => {
+  try {
+    const { images } = req.body;
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ error: 'لم يتم إرسال أي صور' });
+    }
+
+    const urls = [];
+    images.forEach((img, idx) => {
+      const matches = img.match(/^data:([A-Za-z0-9\-+\/]+);base64,(.+)$/);
+      if (!matches || matches.length !== 3) {
+        urls.push(img);
+        return;
+      }
+
+      const mime = matches[1].toLowerCase();
+      let ext = 'png';
+      if (mime.includes('jpeg') || mime.includes('jpg')) ext = 'jpg';
+      else if (mime.includes('webp')) ext = 'webp';
+      else if (mime.includes('gif')) ext = 'gif';
+
+      const safeRandom = Math.random().toString(36).substring(2, 8);
+      const cleanFileName = `prod_${Date.now()}_${idx}_${safeRandom}.${ext}`;
+      const filePath = path.join(UPLOADS_DIR, cleanFileName);
+
+      const buffer = Buffer.from(matches[2], 'base64');
+      fs.writeFileSync(filePath, buffer);
+      urls.push(`/uploads/${cleanFileName}`);
+    });
+
+    res.json({ success: true, urls });
+  } catch (err) {
+    console.error('Multiple images upload error:', err);
+    res.status(500).json({ error: 'فشل حفظ الصور: ' + err.message });
+  }
 });
 
 // 2. Categories
@@ -286,7 +371,7 @@ app.post('/api/orders', (req, res) => {
     quantity: qty,
     unitPrice: product.price,
     totalAmount,
-    currency: (data.settings && data.settings.currency) || 'ريال',
+    currency: (data.settings && data.settings.currency) || 'د.ع',
     supplierCost: (product.supplierCost || 0) * qty,
     estimatedProfit: (totalAmount - ((product.supplierCost || 0) * qty)),
     status: 'pending_confirmation', // pending_confirmation, confirmed, shipped, delivered, cancelled
@@ -369,7 +454,7 @@ app.get('/api/stats', (req, res) => {
     confirmedOrders,
     totalRevenue,
     totalEstimatedProfit,
-    currency: (data.settings && data.settings.currency) || 'ريال'
+    currency: (data.settings && data.settings.currency) || 'د.ع'
   });
 });
 

@@ -341,6 +341,23 @@ function closeSuccessModal() {
   modal.classList.remove('active');
 }
 
+// Lightbox HD Image View
+function openLightbox() {
+  const mainImg = document.getElementById('lpMainImage');
+  const lbModal = document.getElementById('lpImageLightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  if (mainImg && lbModal && lbImg) {
+    lbImg.src = mainImg.src;
+    lbModal.classList.add('active');
+  }
+}
+
+function closeLightbox(e) {
+  if (e && e.target && e.target.id === 'lightboxImg') return; // Don't close if clicking on image
+  const lbModal = document.getElementById('lpImageLightbox');
+  if (lbModal) lbModal.classList.remove('active');
+}
+
 // Event Listeners on Load
 document.addEventListener('DOMContentLoaded', () => {
   loadLandingPage();
