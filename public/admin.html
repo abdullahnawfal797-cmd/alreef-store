@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم | إدارة صفحات الهبوط والطلبات</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand-logo">
+        <img src="/images/logo.png" alt="شعار الريف ستور" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1.5px solid rgba(223, 168, 65, 0.5); box-shadow: 0 4px 12px rgba(12, 35, 64, 0.15);" />
+        <span>لوحة إدارة الريف ستور</span>
+      </div>
+      <nav class="nav-links">
+        <a href="/" target="_blank" class="nav-btn outline">
+          <span>👁️ عرض الواجهة العامة</span>
+        </a>
+        <button type="button" class="nav-btn primary" onclick="openProductModal()">
+          <span>+ إضافة منتج / بوابة جديدة</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 30px; padding-bottom: 60px;">
+
+    <!-- Top Admin Header -->
+    <div class="admin-header">
+      <div>
+        <h1 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 6px;">مرحباً بك في مركز التحكم</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">تحكم بأسعارك، كمياتك، بوابات الهبوط، وتابع طلباتك اليومية مباشرة.</p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="nav-btn primary" onclick="exportOrdersToCSV()">
+          <span>📥 تصدير الطلبات للتاجر (CSV)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">إجمالي البوابات والمنتجات</div>
+        <div class="stat-value" id="statProducts">0</div>
+        <div class="stat-hint" id="statActiveProducts">0 بوابة نشطة حالياً</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">إجمالي المبيعات المسجلة</div>
+        <div class="stat-value" id="statRevenue">0</div>
+        <div class="stat-hint" id="statProfit">أرباح تقديرية: 0</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">طلبات بانتظار التأكيد</div>
+        <div class="stat-value" id="statPendingOrders">0</div>
+        <div class="stat-hint">تواصل معهم لتأكيد العنوان والشحن</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">إجمالي الطلبات الكلية</div>
+        <div class="stat-value" id="statTotalOrders">0</div>
+        <div class="stat-hint" id="statConfirmedOrders">0 طلب مؤكد ومستلم</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('productsTab', this)">
+        🛍️ بوابات المنتجات (<span id="tabCountProducts">0</span>)
+      </button>
+      <button class="tab-btn" onclick="switchTab('ordersTab', this)">
+        📦 الطلبات الواردة (<span id="tabCountOrders">0</span>)
+      </button>
+      <button class="tab-btn" onclick="switchTab('settingsTab', this)">
+        ⚙️ إعدادات المتجر والواتساب
+      </button>
+    </div>
+
+    <!-- TAB 1: Products Management -->
+    <div id="productsTab" class="tab-pane active">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <input type="text" id="productSearch" class="form-input" placeholder="🔍 ابحث في المنتجات..." style="width: 250px; padding: 8px 14px;" oninput="filterProductsTable()" />
+          <select id="categoryFilter" class="form-select" style="width: 170px; padding: 8px 14px;" onchange="filterProductsTable()">
+            <option value="الكل">جميع الفئات</option>
+          </select>
+        </div>
+        <button class="nav-btn primary" onclick="openProductModal()">
+          <span>+ إضافة بوابة منتج جديدة</span>
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>المنتج</th>
+              <th>الفئة</th>
+              <th>سعر البيع</th>
+              <th>تكلفة التاجر</th>
+              <th>عمولتك / الربح</th>
+              <th>المخزون</th>
+              <th>الحالة</th>
+              <th>صفحة الهبوط</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <!-- Injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: Orders Management -->
+    <div id="ordersTab" class="tab-pane" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <select id="orderStatusFilter" class="form-select" style="width: 200px; padding: 8px 14px;" onchange="loadOrders()">
+            <option value="all">جميع الحالات</option>
+            <option value="pending_confirmation">بانتظار التأكيد (جديد)</option>
+            <option value="confirmed">تم التأكيد</option>
+            <option value="shipped">تم الشحن للعميل</option>
+            <option value="delivered">تم الاستلام وتحصيل المبلغ</option>
+            <option value="cancelled">ملغي</option>
+          </select>
+        </div>
+        <button class="nav-btn outline" onclick="loadOrders()">
+          <span>🔄 تحديث الطلبات</span>
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>رقم الطلب</th>
+              <th>تاريخ الطلب</th>
+              <th>المنتج</th>
+              <th>العميل ورقم الهاتف</th>
+              <th>المدينة والعنوان</th>
+              <th>الكمية والمبلغ</th>
+              <th>حالة الطلب</th>
+              <th>تأكيد واتساب</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody">
+            <!-- Injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: Store & WhatsApp Settings -->
+    <div id="settingsTab" class="tab-pane" style="display: none;">
+      <div style="max-width: 650px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 28px;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 20px;">إعدادات المتجر ورقم الواتساب</h3>
+        
+        <form id="settingsForm" onsubmit="saveSettings(event)">
+          <div class="form-group">
+            <label class="form-label">اسم المتجر أو العلامة التجارية *</label>
+            <input type="text" id="settingStoreName" class="form-input" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">رقم هاتف الواتساب لاستقبال الطلبات * (مع رمز الدولة: 9647723457175)</label>
+            <input type="text" id="settingWhatsapp" class="form-input" placeholder="9647723457175" required dir="ltr" style="text-align: right;" />
+            <small style="color: var(--text-dim); display: block; margin-top: 4px;">
+              يستخدم هذا الرقم في زر "اطلب عبر واتساب" ورسائل تأكيد الطلب المباشرة.
+            </small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">عملة المتجر *</label>
+              <input type="text" id="settingCurrency" class="form-input" placeholder="د.ع" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">الشريط الترويجي العلوي (في صفحات الهبوط)</label>
+            <textarea id="settingAnnouncement" class="form-textarea" rows="2"></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit" style="margin-top: 10px;">
+            حفظ التعديلات 💾
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- PRODUCT ADD / EDIT MODAL -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title" id="productModalTitle">إضافة بوابة منتج جديدة</h2>
+        <button type="button" class="modal-close" onclick="closeProductModal()">✕</button>
+      </div>
+
+      <form id="productForm" onsubmit="saveProduct(event)">
+        <input type="hidden" id="prodEditId" value="" />
+
+        <div class="form-group">
+          <label class="form-label">اسم المنتج *</label>
+          <input type="text" id="prodTitle" class="form-input" placeholder="مثال: ساعة الترا الذكية الجيل التاسع الأصلية" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">الفئة / التصنيف *</label>
+            <input type="text" id="prodCategory" class="form-input" placeholder="مثال: إلكترونيات، العناية، المنزل..." required list="categoriesList" />
+            <datalist id="categoriesList"></datalist>
+          </div>
+          <div class="form-group">
+            <label class="form-label">الرابط المخصص (Slug) - اختياري</label>
+            <input type="text" id="prodSlug" class="form-input" placeholder="مثال: smart-watch-ultra" dir="ltr" style="text-align: right;" />
+            <small style="color: var(--text-dim);">سيظهر في الرابط: /p/your-slug</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">سعر البيع للزبون (د.ع) *</label>
+            <input type="number" id="prodPrice" class="form-input" placeholder="35000" required min="1" step="any" oninput="calculateMarginPreview()" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">السعر الأصلي قبل الخصم (د.ع)</label>
+            <input type="number" id="prodOriginalPrice" class="form-input" placeholder="65000" min="0" step="any" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">تكلفة التاجر / المورد (خاص بك)</label>
+            <input type="number" id="prodSupplierCost" class="form-input" placeholder="20000" min="0" step="any" oninput="calculateMarginPreview()" />
+            <div id="marginPreview" style="font-size: 0.85rem; color: #059669; font-weight: 800; margin-top: 4px;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">الكمية المتاحة (المخزون) *</label>
+            <input type="number" id="prodStock" class="form-input" placeholder="25" required min="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">شارة ترويجية (Badge)</label>
+          <input type="text" id="prodBadge" class="form-input" placeholder="مثال: الأكثر مبيعاً على تيك توك 🔥 أو خصم 50%" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">رابط الصورة الرئيسية للمنتج *</label>
+          <input type="url" id="prodImage" class="form-input" placeholder="https://images.unsplash.com/..." required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">روابط صور إضافية للمعرض (مفصولة بفواصل أو أسطر)</label>
+          <textarea id="prodGallery" class="form-textarea" rows="2" placeholder="https://image1.jpg, https://image2.jpg"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">وصف تسويقي مختصر (حل المشكلة)</label>
+          <textarea id="prodBrief" class="form-textarea" rows="2" placeholder="شرح موجز وجذاب للمنتج ولماذا يحتاجه الزبون الآن"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">مميزات المنتج (ميزة في كل سطر)</label>
+          <textarea id="prodFeatures" class="form-textarea" rows="4" placeholder="مكالمات بلوتوث نقية&#10;مقاومة للماء&#10;بطارية تدوم 5 أيام"></textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" id="prodActive" checked style="width: 18px; height: 18px;" />
+          <label for="prodActive" style="font-weight: 700; cursor: pointer;">تفعيل هذه البوابة وعرضها في المتجر</label>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnSaveProduct">
+          حفظ ونشر بوابة المنتج 🚀
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-msg" id="adminToast">
+    <span id="adminToastIcon">✅</span>
+    <span id="adminToastText">تمت العملية بنجاح!</span>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

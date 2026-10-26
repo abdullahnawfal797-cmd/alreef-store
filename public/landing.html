@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>صفحة المنتج | أقوى العروض في العراق</title>
+  <meta name="description" content="اطلب الآن بالدينار العراقي مع توصيل سريع لكافة المحافظات والدفع عند الاستلام والمعاينة قبل الدفع">
+  <link rel="stylesheet" href="/css/landing.css">
+</head>
+<body class="landing-page">
+
+  <!-- Urgent Top Announcement Bar -->
+  <div class="lp-topbar" id="lpAnnouncement">
+    🔥 عروض ترويجية حصرية: توصيل سريع لكافة المحافظات + فحص المنتج والمعاينة قبل الدفع!
+  </div>
+
+  <div class="lp-container">
+
+    <!-- Store Brand Header -->
+    <header class="lp-brand-nav">
+      <div class="lp-brand-title">
+        <img src="/images/logo.png" alt="شعار الريف ستور" class="lp-brand-logo-img" />
+        <span id="lpBrandName">الريف ستور | Al-Reef Store</span>
+      </div>
+      <a href="/" class="lp-back-btn">
+        <span>تصفح المزيد</span>
+        <span>←</span>
+      </a>
+    </header>
+
+    <!-- Badges Row -->
+    <div class="lp-badge-row">
+      <span class="lp-tag" id="lpBadge">الأكثر طلباً بالعراق 🔥</span>
+      <span class="lp-stock-pill" id="lpStock">متبقي قطع محدودة ⚠️</span>
+    </div>
+
+    <!-- Product Title -->
+    <h1 class="lp-title" id="lpTitle">جاري تحميل تفاصيل المنتج...</h1>
+
+    <!-- Rating & Social Proof -->
+    <div class="lp-rating-row">
+      <span class="lp-stars">★★★★★</span>
+      <span id="lpRatingText">4.9 (380+ عميل راضٍ بالعراق)</span>
+      <span style="color: #cbd5e1;">•</span>
+      <span style="color: #059669; font-weight: 800;">طلب مؤكد اليوم: 38</span>
+    </div>
+
+    <!-- Gallery Card -->
+    <div class="lp-gallery-card">
+      <div class="lp-main-img-wrap">
+        <img id="lpMainImage" class="lp-main-img" src="" alt="صورة المنتج" />
+      </div>
+      <div class="lp-thumb-row" id="lpThumbRow">
+        <!-- Thumbnails populated dynamically -->
+      </div>
+    </div>
+
+    <!-- Urgency Countdown Timer -->
+    <div class="lp-timer-box">
+      <div class="lp-timer-label">
+        ⏳ ينتهي هذا الخصم والعرض الخاص خلال:
+      </div>
+      <div class="lp-timer-digits">
+        <span class="timer-unit" id="tHours">04</span> :
+        <span class="timer-unit" id="tMins">35</span> :
+        <span class="timer-unit" id="tSecs">18</span>
+      </div>
+    </div>
+
+    <!-- Pricing Card -->
+    <div class="lp-price-card">
+      <div class="lp-prices">
+        <span class="lp-current-price" id="lpCurrentPrice">0</span>
+        <span class="lp-currency" id="lpCurrency">د.ع</span>
+        <span class="lp-old-price" id="lpOldPrice">0 د.ع</span>
+      </div>
+      <div class="lp-save-badge" id="lpSaveBadge">
+        وفر 50% اليوم
+      </div>
+    </div>
+
+    <!-- Trust Badges (Iraq Market Tailored) -->
+    <div class="lp-trust-grid">
+      <div class="lp-trust-item">
+        <span class="lp-trust-icon">🇮🇶</span>
+        <div class="lp-trust-text">توصيل سريع لباب بيتك (صلاح الدين، بغداد، وكافة محافظات العراق)</div>
+      </div>
+      <div class="lp-trust-item">
+        <span class="lp-trust-icon">🔍</span>
+        <div class="lp-trust-text">افحص وعاين المنتج أمام المندوب وتأكد منه قبل دفع أي دينار</div>
+      </div>
+      <div class="lp-trust-item">
+        <span class="lp-trust-icon">🛡️</span>
+        <div class="lp-trust-text">ضمان استبدال واسترجاع حقيقي خلال 7 أيام من الاستلام</div>
+      </div>
+      <div class="lp-trust-item">
+        <span class="lp-trust-icon">💬</span>
+        <div class="lp-trust-text">خدمة عملاء ودعم مستمر عبر الواتساب (07723457175)</div>
+      </div>
+    </div>
+
+    <!-- Product Features -->
+    <div class="lp-section-card">
+      <h2 class="lp-section-title">
+        <span>✨</span>
+        <span>أهم مميزات ومواصفات المنتج:</span>
+      </h2>
+      <p id="lpBrief" style="color: #475569; font-size: 1rem; margin-bottom: 18px; line-height: 1.7;"></p>
+      <ul class="lp-features-list" id="lpFeaturesList">
+        <!-- Features populated by JS -->
+      </ul>
+    </div>
+
+    <!-- The COD Quick Order Form Section -->
+    <div class="lp-order-card" id="lpOrderSection">
+      <div class="lp-order-header">
+        <div class="lp-order-title">🛍️ استمارة الطلب السريع - الدفع عند الاستلام</div>
+        <div class="lp-order-sub">املأ معلوماتك وسيتم شحن طلبك والتواصل معك فوراً</div>
+      </div>
+
+      <!-- Quantity Stepper -->
+      <div class="lp-qty-row">
+        <span style="font-weight: 800; font-size: 1rem; color: #0f172a;">الكمية المطلوبة:</span>
+        <div class="lp-qty-controls">
+          <button type="button" class="lp-qty-btn" onclick="changeQuantity(-1)">-</button>
+          <span class="lp-qty-val" id="lpQtyVal">1</span>
+          <button type="button" class="lp-qty-btn" onclick="changeQuantity(1)">+</button>
+        </div>
+      </div>
+
+      <form id="lpOrderForm">
+        <div class="lp-input-group">
+          <label class="lp-label" for="orderName">الاسم الكامل *</label>
+          <input type="text" id="orderName" class="lp-input" placeholder="مثال: علي محمد" required />
+        </div>
+
+        <div class="lp-input-group">
+          <label class="lp-label" for="orderPhone">رقم الهاتف / الواتساب في العراق *</label>
+          <input type="tel" id="orderPhone" class="lp-input" placeholder="مثال: 077XXXXXXXX أو 078XXXXXXXX" required dir="ltr" style="text-align: right;" />
+        </div>
+
+        <div class="lp-input-group">
+          <label class="lp-label" for="orderGovernorate">المحافظة *</label>
+          <select id="orderGovernorate" class="lp-select" required>
+            <option value="" disabled selected>-- اختر محافظتك --</option>
+            <option value="صلاح الدين">صلاح الدين (العلم، تكريت، سامراء، بيجي...)</option>
+            <option value="بغداد">بغداد (الرصافة والكرخ)</option>
+            <option value="أربيل">أربيل</option>
+            <option value="كركوك">كركوك</option>
+            <option value="نينوى / الموصل">نينوى / الموصل</option>
+            <option value="البصرة">البصرة</option>
+            <option value="السليمانية">السليمانية</option>
+            <option value="دهوك">دهوك</option>
+            <option value="الأنبار">الأنبار (الرمادي، الفلوجة...)</option>
+            <option value="النجف الأشرف">النجف الأشرف</option>
+            <option value="كربلاء المقدسة">كربلاء المقدسة</option>
+            <option value="بابل / الحلة">بابل / الحلة</option>
+            <option value="ديالى">ديالى / بعقوبة</option>
+            <option value="ذي قار / الناصرية">ذي قار / الناصرية</option>
+            <option value="ميسان / العمارة">ميسان / العمارة</option>
+            <option value="واسط / الكوت">واسط / الكوت</option>
+            <option value="القادسية / الديوانية">القادسية / الديوانية</option>
+            <option value="المثنى / السماوة">المثنى / السماوة</option>
+          </select>
+        </div>
+
+        <div class="lp-input-group">
+          <label class="lp-label" for="orderCity">القضاء / الحي والشارع بالتفصيل *</label>
+          <input type="text" id="orderCity" class="lp-input" placeholder="مثال: قضاء العلم - قرب السوق / حي..." required />
+        </div>
+
+        <div class="lp-input-group">
+          <label class="lp-label" for="orderNotes">ملاحظات إضافية للتوصيل (اختياري)</label>
+          <input type="text" id="orderNotes" class="lp-input" placeholder="مثال: الاتصال قبل الوصول بنصف ساعة" />
+        </div>
+
+        <!-- Big Pulsating CTA Button -->
+        <button type="submit" class="lp-btn-cta" id="lpSubmitBtn">
+          <span>اضغط هنا لتأكيد طلبك الآن</span>
+          <span>⚡</span>
+        </button>
+
+        <!-- Or Direct WhatsApp Order -->
+        <button type="button" class="lp-btn-whatsapp" id="lpBtnWhatsApp">
+          <span style="font-size: 1.3rem;">💬</span>
+          <span>أو اطلب عبر واتساب مباشرة (07723457175)</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Guarantee Footer Note -->
+    <div style="text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 24px; font-weight: 600;">
+      🔒 الدفع نقداً بالدينار العراقي عند استلام ومعاينة الشحنة • لا حاجة لأي بطاقة دفع إلكتروني
+    </div>
+
+  </div>
+
+  <!-- Sticky Bottom Purchase Bar (for mobile visitors scrolling) -->
+  <div class="lp-sticky-bar">
+    <div class="lp-sticky-price-col">
+      <span class="lp-sticky-label">المبلغ الإجمالي:</span>
+      <span class="lp-sticky-price" id="lpStickyPrice">0 د.ع</span>
+    </div>
+    <button class="lp-sticky-btn" onclick="scrollToOrderForm()">
+      اطلب الآن (الدفع عند الاستلام) 🛍️
+    </button>
+  </div>
+
+  <!-- Order Success Modal -->
+  <div class="lp-modal" id="lpSuccessModal">
+    <div class="lp-modal-content">
+      <div class="lp-success-icon">✓</div>
+      <h3 style="font-size: 1.5rem; font-weight: 900; color: #0f172a; margin-bottom: 8px;">تم استلام طلبك بنجاح!</h3>
+      <p style="color: #475569; font-size: 0.95rem; line-height: 1.6;">
+        شكراً لثقتك بنا. سيتواصل معك فريقنا عبر الواتساب أو الهاتف لتأكيد الشحن والتسليم لباب بيتك.
+      </p>
+
+      <div id="modalOrderDetails">
+        <!-- Details injected by JS -->
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
+        <a id="modalWaFollowup" href="#" target="_blank" class="lp-btn-whatsapp" style="margin: 0; background: #25d366; color: #fff;">
+          <span>💬</span>
+          <span>تواصل معنا فوراً عبر واتساب لتسريع التوصيل</span>
+        </a>
+        <button type="button" onclick="closeSuccessModal()" style="padding: 12px; background: #f1f5f9; border: 1px solid #e2e8f0; color: #0f172a; border-radius: 14px; cursor: pointer; font-weight: 800;">
+          إغلاق
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/landing.js"></script>
+</body>
+</html>

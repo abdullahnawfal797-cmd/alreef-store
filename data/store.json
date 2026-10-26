@@ -1,0 +1,137 @@
+{
+  "settings": {
+    "storeName": "الريف ستور | Al-Reef Store",
+    "whatsappNumber": "9647723457175",
+    "currency": "د.ع",
+    "announcement": "🌿 عروض الريف ستور الحصرية: توصيل سريع لكافة محافظات العراق (صلاح الدين، بغداد، وكافة المدن) + فحص المنتج والمعاينة قبل الدفع!",
+    "enableDirectWhatsapp": true,
+    "enableCodForm": true,
+    "logoUrl": "/images/logo.png"
+  },
+  "categories": [
+    "الكل",
+    "إلكترونيات وذكاء",
+    "العناية والمظهر",
+    "المنزل والمطبخ",
+    "إكسسوارات وسيارات"
+  ],
+  "products": [
+    {
+      "id": "prod_1",
+      "slug": "smart-watch-ultra",
+      "title": "ساعة الترا الذكية الجيل التاسع Ultra Watch 9 الأصلية (مع 3 أحزمة إضافية هدية)",
+      "category": "إلكترونيات وذكاء",
+      "price": 35000,
+      "originalPrice": 65000,
+      "stock": 19,
+      "badge": "الأكثر طلباً بالعراق على تيك توك 🔥",
+      "rating": 4.9,
+      "reviewsCount": 380,
+      "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=800&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80"
+      ],
+      "brief": "شاشة أموليد عملاقة نقية جداً، إجراء واستقبال المكالمات، قياس النبض والأكسجين، تدعم الإشعارات العربية بالكامل، وبطارية جبارة تدوم أيام.",
+      "features": [
+        "إجراء واستقبال المكالمات بصوت عالي ونقي جداً عبر البلوتوث",
+        "شاشة AMOLED دقة عالية مضادة للخدش والصدمات",
+        "تدعم قراءة رسائل الواتساب والإشعارات باللغة العربية بوضوح تام",
+        "قياس دقيق لضغط الدم ونبضات القلب ونسبة الأكسجين ومراقبة النوم",
+        "تأتي مع 3 أحزمة مختلفة مجاناً داخل العلبة (سيليكون، قماش، ستيل)"
+      ],
+      "supplierCost": 20000,
+      "active": true
+    },
+    {
+      "id": "prod_2",
+      "slug": "vintage-t9-trimmer",
+      "title": "ماكينة الحلاقة والتحديد الاحترافية اللاسلكية الأصلية Vintage T9",
+      "category": "العناية والمظهر",
+      "price": 18000,
+      "originalPrice": 35000,
+      "stock": 42,
+      "badge": "اختيار الحلاقين رقم 1 ⭐",
+      "rating": 4.8,
+      "reviewsCount": 260,
+      "image": "https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=800&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80"
+      ],
+      "brief": "شفرات تيتانيوم منقوشة بالليزر حادة جداً صفر كالموس دون أي تحسس، هيكل معدني ذهبي فاخر وبطارية شحن سريعة.",
+      "features": [
+        "تحديد وقص دقيق للحية والشعر درجة صفر ناعم دون جروح",
+        "هيكل معدني ذهبي كلاسيكي ثقيل مقاوم للصدأ والماء",
+        "شحن سريع عبر منفذ USB مع بطارية تدوم أكثر من 120 دقيقة عمل مستمر",
+        "تأتي مع كامل ملحقاتها: 4 أمشاط تدريج، فرشاة تنظيف، وسلك شحن"
+      ],
+      "supplierCost": 9000,
+      "active": true
+    },
+    {
+      "id": "prod_3",
+      "slug": "electric-multi-chopper",
+      "title": "المفرمة الكهربائية الذكية 4 في 1 المقاومة للماء (ستانلس ستيل أصلي 3 لتر)",
+      "category": "المنزل والمطبخ",
+      "price": 25000,
+      "originalPrice": 48000,
+      "stock": 15,
+      "badge": "أقوى مفرمة مطبخ لعام 2026 ⚡",
+      "rating": 4.9,
+      "reviewsCount": 415,
+      "image": "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=800&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=800&q=80"
+      ],
+      "brief": "تفرم اللحم والسمك والخضار وتطحن المكسرات في 5 ثوانٍ فقط، محرك نحاسي قوي وسعة كبيرة 3 لتر.",
+      "features": [
+        "محرك نحاسي جبار بقوة 500 واط مع سرعتين للفرم الناعم والخشن",
+        "وعاء ستيل متين سعة 3 لتر صحي ضد الكسر والصدأ",
+        "4 شفرات حادة مزدوجة من الفولاذ المقاوم للصدأ",
+        "سهلة الفك والغسيل بضغطة زر واحدة"
+      ],
+      "supplierCost": 13000,
+      "active": true
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord_101",
+      "productId": "prod_1",
+      "productTitle": "ساعة الترا الذكية الجيل التاسع Ultra Watch 9 الأصلية",
+      "customerName": "علي الجبوري",
+      "customerPhone": "07701234567",
+      "customerCity": "صلاح الدين - قضاء العلم",
+      "customerNotes": "يرجى الاتصال قبل الوصول",
+      "quantity": 1,
+      "unitPrice": 35000,
+      "totalAmount": 35000,
+      "currency": "د.ع",
+      "supplierCost": 20000,
+      "estimatedProfit": 15000,
+      "status": "pending_confirmation",
+      "createdAt": "2026-10-26T10:15:00.000Z",
+      "source": "tiktok_landing"
+    },
+    {
+      "id": "ord_102",
+      "productId": "prod_2",
+      "productTitle": "ماكينة الحلاقة والتحديد الاحترافية اللاسلكية الأصلية Vintage T9",
+      "customerName": "عمر السامرائي",
+      "customerPhone": "07809876543",
+      "customerCity": "بغداد - الكرخ / حي الجامعة",
+      "customerNotes": "",
+      "quantity": 1,
+      "unitPrice": 18000,
+      "totalAmount": 18000,
+      "currency": "د.ع",
+      "supplierCost": 9000,
+      "estimatedProfit": 9000,
+      "status": "confirmed",
+      "createdAt": "2026-10-26T11:40:00.000Z",
+      "source": "instagram_landing"
+    }
+  ]
+}

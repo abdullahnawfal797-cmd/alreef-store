@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>العلم ستور | أقوى العروض والتخفيضات في العراق</title>
+  <meta name="description" content="تسوق أفضل المنتجات في العراق بالدينار العراقي مع توصيل سريع لكافة المحافظات والدفع عند الاستلام والمعاينة قبل الدفع">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-logo">
+        <img src="/images/logo.png" alt="شعار الريف ستور" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1.5px solid rgba(223, 168, 65, 0.5); box-shadow: 0 4px 12px rgba(12, 35, 64, 0.15);" />
+        <span id="navStoreName">الريف ستور | Al-Reef Store</span>
+      </a>
+      <nav class="nav-links">
+        <a href="https://wa.me/9647723457175" target="_blank" class="nav-btn outline" style="color: #059669; border-color: rgba(16,185,129,0.3);">
+          <span>💬 واتساب: 07723457175</span>
+        </a>
+        <a href="/admin" class="nav-btn primary">
+          <span>⚙️ لوحة الإدارة والتحكم</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-pill">
+        <span>🇮🇶</span>
+        <span id="heroAnnouncement">عروض حصرية: توصيل سريع لصلاح الدين وبغداد وكافة محافظات العراق</span>
+      </div>
+      <h1 class="hero-title">
+        صفقات حصرية مختارة بعناية لأجلك في العراق
+      </h1>
+      <p class="hero-desc">
+        تصفح بوابات المنتجات المميزة، كل منتج يتمتع بصفحة هبوط مخصصة وسريعة تتيح لك المعاينة والشراء بنقرة واحدة بالدينار العراقي مع الدفع عند الاستلام بعد فحص المنتج.
+      </p>
+
+      <!-- Categories Filter -->
+      <div class="categories-bar" id="categoriesBar">
+        <button class="category-chip active" onclick="filterByCategory('الكل')">الكل</button>
+        <!-- Categories injected via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Products Showcase Grid -->
+  <main class="container">
+    <div class="products-grid" id="productsGrid">
+      <!-- Injected by JS -->
+      <div style="grid-column: 1/-1; text-align: center; padding: 60px 0; color: #64748b; font-weight: 700;">
+        جاري تحميل المنتجات... ⏳
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast-msg" id="toast">
+    <span id="toastIcon">📋</span>
+    <span id="toastText">تم نسخ الرابط بنجاح!</span>
+  </div>
+
+  <script>
+    let allProducts = [];
+    let currentCategory = 'الكل';
+    let storeSettings = {};
+
+    function formatNumber(n) {
+      return Number(n || 0).toLocaleString('en-US');
+    }
+
+    function showToast(text, icon = '📋') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastText').innerText = text;
+      document.getElementById('toastIcon').innerText = icon;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    function copyLandingLink(slug) {
+      const url = `${window.location.origin}/p/${slug}`;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('تم نسخ رابط صفحة الهبوط! الصقه الآن في بايو تيك توك أو إنستغرام 🚀', '📋');
+      }).catch(() => {
+        showToast('الرابط: ' + url);
+      });
+    }
+
+    async function loadStorefront() {
+      try {
+        const [settRes, catRes, prodRes] = await Promise.all([
+          fetch('/api/settings'),
+          fetch('/api/categories'),
+          fetch('/api/products?activeOnly=true')
+        ]);
+
+        storeSettings = await settRes.json();
+        const categories = await catRes.json();
+        allProducts = await prodRes.json();
+
+        // Update settings in UI
+        if (storeSettings.storeName) {
+          document.getElementById('navStoreName').innerText = storeSettings.storeName;
+          document.title = `${storeSettings.storeName} | أفضل العروض في العراق`;
+        }
+        if (storeSettings.announcement) {
+          document.getElementById('heroAnnouncement').innerText = storeSettings.announcement;
+        }
+
+        // Render Categories
+        renderCategories(categories);
+
+        // Render Products
+        renderProducts();
+      } catch (err) {
+        console.error('Error loading storefront:', err);
+      }
+    }
+
+    function renderCategories(categories) {
+      const bar = document.getElementById('categoriesBar');
+      bar.innerHTML = '';
+      
+      const uniqueCats = ['الكل', ...new Set(categories.filter(c => c !== 'الكل'))];
+      uniqueCats.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = `category-chip ${cat === currentCategory ? 'active' : ''}`;
+        btn.innerText = cat;
+        btn.onclick = () => filterByCategory(cat);
+        bar.appendChild(btn);
+      });
+    }
+
+    function filterByCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.category-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText === cat);
+      });
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('productsGrid');
+      const filtered = currentCategory === 'الكل' 
+        ? allProducts 
+        : allProducts.filter(p => p.category === currentCategory);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; background: #ffffff; border-radius: 20px; border: 1px dashed #cbd5e1; box-shadow: var(--shadow-card);">
+            <p style="font-size: 1.2rem; color: #475569; margin-bottom: 14px; font-weight: 700;">لا توجد منتجات معروضة في هذه الفئة حالياً</p>
+            <a href="/admin" class="nav-btn primary" style="display: inline-flex;">+ أضف منتجك الأول من لوحة التحكم</a>
+          </div>
+        `;
+        return;
+      }
+
+      const currency = storeSettings.currency || 'د.ع';
+      grid.innerHTML = filtered.map(p => {
+        const landingUrl = `/p/${p.slug || p.id}`;
+        const discountPercent = p.originalPrice > p.price 
+          ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) 
+          : 0;
+
+        return `
+          <div class="product-card">
+            <div class="product-thumb-wrap">
+              <img src="${p.image}" alt="${p.title}" class="product-thumb" loading="lazy" />
+              ${p.badge ? `<div class="badge-float">${p.badge}</div>` : ''}
+              ${discountPercent > 0 ? `<div class="discount-tag">خصم ${discountPercent}%</div>` : ''}
+            </div>
+            <div class="product-body">
+              <span class="product-cat">${p.category}</span>
+              <h3 class="product-title" title="${p.title}">${p.title}</h3>
+              <p class="product-brief">${p.brief || ''}</p>
+              
+              <div class="product-pricing">
+                <span class="price-current">${formatNumber(p.price)}</span>
+                <span class="price-currency">${currency}</span>
+                ${p.originalPrice > p.price ? `<span class="price-old">${formatNumber(p.originalPrice)} ${currency}</span>` : ''}
+              </div>
+
+              <div class="product-actions">
+                <a href="${landingUrl}" class="btn-view-landing" target="_blank">
+                  <span>فتح صفحة الهبوط</span>
+                  <span>↗</span>
+                </a>
+                <button type="button" class="btn-quick-wa" title="نسخ رابط صفحة الهبوط لتيك توك وإنستا" onclick="copyLandingLink('${p.slug}')">
+                  🔗
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadStorefront);
+  </script>
+</body>
+</html>

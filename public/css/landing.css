@@ -1,0 +1,693 @@
+/* --- Al-Reef Store (الريف ستور) - Luxury Glassmorphism Landing Page --- */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  /* Logo Colors */
+  --reef-navy: #0c2340;
+  --reef-navy-dark: #071526;
+  --reef-emerald: #1b9963;
+  --reef-emerald-dark: #127449;
+  --reef-gold: #dfa841;
+  --reef-gold-light: #fef3c7;
+  --reef-white: #ffffff;
+
+  /* Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-border-accent: rgba(27, 153, 99, 0.35);
+  --glass-shadow: 0 20px 40px -15px rgba(12, 35, 64, 0.09), 0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+  --glass-shadow-hover: 0 30px 60px -12px rgba(12, 35, 64, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+
+  --reef-primary-grad: linear-gradient(135deg, #0c2340 0%, #16406f 100%);
+  --reef-emerald-grad: linear-gradient(135deg, #1b9963 0%, #127449 100%);
+  --reef-gold-grad: linear-gradient(135deg, #e5af3a 0%, #c48a1c 100%);
+
+  --text-main: #0c2340;
+  --text-muted: #334155;
+  --text-dim: #64748b;
+}
+
+body.landing-page {
+  background-color: #f1f5f9;
+  color: var(--text-main);
+  font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+  direction: rtl;
+  margin: 0;
+  padding: 0;
+  padding-bottom: 105px; /* Space for sticky bottom bar */
+  line-height: 1.6;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  
+  /* Luxury Ambient Glassmorphism Backdrops (Navy, Emerald & Gold Orbs) */
+  background-image: 
+    radial-gradient(circle at 10% 8%, rgba(27, 153, 99, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 90% 25%, rgba(223, 168, 65, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 50% 60%, rgba(12, 35, 64, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 20% 90%, rgba(27, 153, 99, 0.12) 0%, transparent 45%);
+  background-attachment: fixed;
+}
+
+/* Ambient Floating Glow Elements */
+body.landing-page::before {
+  content: '';
+  position: fixed;
+  top: -120px;
+  right: -120px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(223, 168, 65, 0.18) 0%, transparent 70%);
+  filter: blur(50px);
+  z-index: -1;
+  pointer-events: none;
+}
+body.landing-page::after {
+  content: '';
+  position: fixed;
+  bottom: -150px;
+  left: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(27, 153, 99, 0.18) 0%, transparent 70%);
+  filter: blur(60px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Top Announcement Banner */
+.lp-topbar {
+  background: linear-gradient(90deg, #0c2340 0%, #16406f 50%, #0c2340 100%);
+  color: #fff;
+  text-align: center;
+  padding: 12px 18px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(12, 35, 64, 0.2);
+  border-bottom: 2px solid var(--reef-gold);
+}
+.lp-topbar span.fire {
+  color: var(--reef-gold);
+}
+
+/* Main Mobile-First Container */
+.lp-container {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 16px 18px 50px;
+}
+
+/* Brand Nav Header */
+.lp-brand-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--glass-shadow);
+}
+.lp-brand-title {
+  font-weight: 900;
+  font-size: 1.3rem;
+  color: var(--reef-navy);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lp-brand-logo-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 14px rgba(12, 35, 64, 0.25);
+  border: 1.5px solid rgba(223, 168, 65, 0.5);
+}
+
+.lp-back-btn {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(12, 35, 64, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s;
+}
+.lp-back-btn:hover {
+  background: #ffffff;
+  color: var(--reef-emerald);
+  transform: translateY(-1px);
+}
+
+/* Badges Row */
+.lp-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.lp-tag {
+  background: rgba(223, 168, 65, 0.15);
+  color: #b45309;
+  border: 1px solid rgba(223, 168, 65, 0.4);
+  backdrop-filter: blur(10px);
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(223, 168, 65, 0.12);
+}
+.lp-stock-pill {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #be123c;
+  background: rgba(255, 241, 242, 0.8);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+/* Title & Social Proof */
+.lp-title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  line-height: 1.35;
+  margin-bottom: 12px;
+  color: var(--reef-navy);
+}
+
+.lp-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+.lp-stars {
+  color: var(--reef-gold);
+  letter-spacing: 2px;
+  font-size: 1.15rem;
+}
+
+/* Glassmorphism Gallery Card */
+.lp-gallery-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  overflow: hidden;
+  margin-bottom: 26px;
+  position: relative;
+  box-shadow: var(--glass-shadow);
+}
+
+.lp-main-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 410px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lp-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.lp-thumb-row {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  overflow-x: auto;
+  border-top: 1px solid var(--glass-border);
+}
+.lp-thumb-item {
+  width: 74px;
+  height: 74px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2.5px solid transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  background: #fff;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.lp-thumb-item.active {
+  border-color: var(--reef-emerald);
+  box-shadow: 0 0 15px rgba(27, 153, 99, 0.35);
+  transform: translateY(-2px);
+}
+.lp-thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Glass Countdown Urgency Box */
+.lp-timer-box {
+  background: linear-gradient(135deg, rgba(12, 35, 64, 0.95), rgba(22, 64, 111, 0.95));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(223, 168, 65, 0.4);
+  border-radius: 20px;
+  padding: 16px 22px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(12, 35, 64, 0.25);
+  color: #fff;
+}
+.lp-timer-label {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #f1f5f9;
+}
+.lp-timer-digits {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  direction: ltr;
+  font-family: monospace;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #fff;
+}
+.timer-unit {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(223, 168, 65, 0.3);
+  color: var(--reef-gold);
+}
+
+/* Glass Pricing Card */
+.lp-price-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: var(--glass-shadow);
+}
+.lp-prices {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.lp-current-price {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--reef-emerald);
+}
+.lp-currency {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--reef-emerald);
+}
+.lp-old-price {
+  font-size: 1.3rem;
+  color: var(--text-dim);
+  text-decoration: line-through;
+  font-weight: 600;
+}
+.lp-save-badge {
+  background: var(--reef-gold-grad);
+  color: #0c2340;
+  font-weight: 900;
+  font-size: 0.95rem;
+  padding: 8px 20px;
+  border-radius: 999px;
+  box-shadow: 0 4px 18px rgba(223, 168, 65, 0.4);
+}
+
+/* Glass Trust Badges Grid */
+.lp-trust-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.lp-trust-item {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.lp-trust-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--glass-shadow-hover);
+  border-color: rgba(27, 153, 99, 0.35);
+}
+.lp-trust-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+.lp-trust-text {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--reef-navy);
+  line-height: 1.4;
+}
+
+/* Features Glass Card */
+.lp-section-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 26px;
+  padding: 28px;
+  margin-bottom: 30px;
+  box-shadow: var(--glass-shadow);
+}
+.lp-section-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  margin-bottom: 18px;
+  color: var(--reef-navy);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-features-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.lp-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 1.02rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  line-height: 1.6;
+}
+.lp-check-icon {
+  background: rgba(27, 153, 99, 0.15);
+  color: var(--reef-emerald);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border: 1px solid rgba(27, 153, 99, 0.35);
+}
+
+/* Glassmorphism COD Order Form */
+.lp-order-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(30px) saturate(190%);
+  -webkit-backdrop-filter: blur(30px) saturate(190%);
+  border: 2.5px solid var(--reef-emerald);
+  border-radius: 30px;
+  padding: 34px 26px;
+  margin-bottom: 30px;
+  box-shadow: 0 25px 60px -10px rgba(27, 153, 99, 0.2), var(--glass-shadow);
+  position: relative;
+}
+.lp-order-header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+.lp-order-title {
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: var(--reef-navy);
+  margin-bottom: 8px;
+}
+.lp-order-sub {
+  font-size: 0.98rem;
+  color: var(--reef-emerald);
+  font-weight: 800;
+}
+
+/* Quantity Controls */
+.lp-qty-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(241, 245, 249, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 14px 20px;
+  border-radius: 18px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: 22px;
+}
+.lp-qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.lp-qty-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--reef-emerald-grad);
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(27, 153, 99, 0.35);
+}
+.lp-qty-btn:active {
+  transform: scale(0.9);
+}
+.lp-qty-val {
+  font-size: 1.4rem;
+  font-weight: 900;
+  min-width: 35px;
+  text-align: center;
+  color: var(--reef-navy);
+}
+
+/* Inputs with Glass Styling */
+.lp-input-group {
+  margin-bottom: 18px;
+}
+.lp-label {
+  display: block;
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--reef-navy);
+  margin-bottom: 8px;
+}
+.lp-input, .lp-select {
+  width: 100%;
+  padding: 15px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid #cbd5e1;
+  color: var(--reef-navy);
+  font-size: 1.02rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+.lp-input:focus, .lp-select:focus {
+  outline: none;
+  border-color: var(--reef-emerald);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(27, 153, 99, 0.2);
+}
+
+/* Big Pulsating CTA Button */
+.lp-btn-cta {
+  width: 100%;
+  padding: 20px 24px;
+  border-radius: 20px;
+  border: none;
+  background: var(--reef-emerald-grad);
+  color: #fff;
+  font-size: 1.38rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 35px rgba(27, 153, 99, 0.45);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  animation: pulse-reef 2.4s infinite;
+}
+@keyframes pulse-reef {
+  0% { transform: scale(1); box-shadow: 0 10px 30px rgba(27, 153, 99, 0.35); }
+  50% { transform: scale(1.02); box-shadow: 0 14px 45px rgba(27, 153, 99, 0.6); }
+  100% { transform: scale(1); box-shadow: 0 10px 30px rgba(27, 153, 99, 0.35); }
+}
+.lp-btn-cta:active {
+  transform: scale(0.98);
+}
+
+/* WhatsApp Alternative Button */
+.lp-btn-whatsapp {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 18px;
+  border: 1.5px solid rgba(37, 211, 102, 0.4);
+  background: rgba(240, 253, 244, 0.85);
+  backdrop-filter: blur(10px);
+  color: #15803d;
+  font-size: 1.12rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  transition: all 0.25s ease;
+}
+.lp-btn-whatsapp:hover {
+  background: #25d366;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.35);
+}
+
+/* Glass Sticky Bottom Bar for Mobile */
+.lp-sticky-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-top: 1px solid var(--glass-border);
+  padding: 14px 22px;
+  z-index: 990;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 -10px 35px rgba(12, 35, 64, 0.08);
+}
+.lp-sticky-price-col {
+  display: flex;
+  flex-direction: column;
+}
+.lp-sticky-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.lp-sticky-price {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--reef-emerald);
+}
+.lp-sticky-btn {
+  flex: 1;
+  max-width: 300px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  border: none;
+  background: var(--reef-emerald-grad);
+  color: #fff;
+  font-weight: 900;
+  font-size: 1.05rem;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(27, 153, 99, 0.4);
+  transition: transform 0.2s;
+}
+
+/* Glass Success Modal */
+.lp-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 35, 64, 0.65);
+  backdrop-filter: blur(12px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.lp-modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+.lp-modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(30px);
+  border: 2px solid var(--reef-emerald);
+  border-radius: 28px;
+  padding: 38px 28px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 30px 70px rgba(12, 35, 64, 0.25);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+.lp-modal.active .lp-modal-content {
+  transform: translateY(0);
+}
+.lp-success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(27, 153, 99, 0.15);
+  color: var(--reef-emerald);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  margin: 0 auto 18px;
+  border: 2.5px solid var(--reef-emerald);
+}
