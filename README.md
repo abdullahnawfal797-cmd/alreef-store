@@ -21,8 +21,12 @@ node server.js
 - لوحة الإدارة: `http://localhost:3000/admin`
 - مثال صفحة هبوط: `http://localhost:3000/p/smart-watch-ultra`
 
-## خطوات النشر المجاني على الإنترنت (Render أو Railway)
-1. رفع المشروع على GitHub.
-2. الدخول إلى [Render.com](https://render.com) وعمل New Web Service.
-3. اختيار مستودع GitHub وتعيين Start Command: `node server.js`.
-4. مبروك! سيصبح لديك رابط دائم مجاناً.
+## روابط المشروع المباشرة على الإنترنت (Live Links)
+- **رابط لوحة التحكم والإدارة (من هاتفك)**: [https://alreef-store.onrender.com/admin](https://alreef-store.onrender.com/admin)
+  - **كلمة المرور السرية**: `reef2026`
+- **رابط المتجر العام للزبائن**: [https://alreef-store.onrender.com](https://alreef-store.onrender.com)
+- **مستودع الكود على غيت هاب (GitHub)**: [https://github.com/abdullahnawfal797-cmd/alreef-store](https://github.com/abdullahnawfal797-cmd/alreef-store)
+- **رقم الواتساب المعتمد للطلبات**: `07723457175` / `9647723457175`
+
+## خطوات النشر والتشغيل
+المشروع مربوط ومستضاف تلقائياً على منصة Render السحابية من خلال فرع `main` على GitHub. أي تعديل يتم دفعه يتم نشره فوراً ومجاناً.
