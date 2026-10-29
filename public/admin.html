@@ -42,9 +42,16 @@
         <h1 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 6px;">مرحباً بك في مركز التحكم</h1>
         <p style="color: var(--text-muted); font-size: 0.95rem;">تحكم بأسعارك، كمياتك، بوابات الهبوط، وتابع طلباتك اليومية مباشرة.</p>
       </div>
-      <div style="display: flex; gap: 10px;">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <button type="button" class="nav-btn outline" onclick="exportStoreBackup()" style="border-color: rgba(5, 150, 105, 0.4); color: #059669; font-weight: 700; background: rgba(5, 150, 105, 0.05);">
+          <span>📥 حفظ نسخة على الهاتف</span>
+        </button>
+        <label class="nav-btn outline" style="border-color: rgba(79, 70, 229, 0.4); color: #4f46e5; font-weight: 700; cursor: pointer; margin: 0; display: inline-flex; align-items: center; background: rgba(79, 70, 229, 0.05);">
+          <span>📤 استرجاع من ملف</span>
+          <input type="file" accept=".json" style="display: none;" onchange="handleImportBackup(this)">
+        </label>
         <button type="button" class="nav-btn primary" onclick="exportOrdersToCSV()">
-          <span>📥 تصدير الطلبات للتاجر (CSV)</span>
+          <span>📊 تصدير الطلبات (CSV)</span>
         </button>
       </div>
     </div>
@@ -73,22 +80,10 @@
       </div>
     </div>
 
-    <!-- SMART LOCAL BACKUP RECOVERY BANNER -->
-    <div id="backupRestoreBanner" style="display: none; background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px solid #dfa841; padding: 18px 24px; border-radius: 20px; margin-bottom: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; box-shadow: 0 10px 25px rgba(223, 168, 65, 0.15);">
-      <div style="display: flex; align-items: center; gap: 14px;">
-        <span style="font-size: 2.2rem;">🛡️</span>
-        <div>
-          <strong style="color: #0c2340; font-size: 1.05rem; display: block; margin-bottom: 4px;">
-            تنبيه ذكي: وجدنا نسخة احتياطية من منتجاتك السابقة محفوظة في متصفحك (<span id="backupProdCount">0</span> منتج)!
-          </strong>
-          <p style="color: #475569; font-size: 0.88rem; line-height: 1.5; margin: 0;">
-            إذا اختفت المنتجات بسبب إعادة تشغيل سيرفر الاستضافة المجاني، يمكنك إعادتها إلى المتجر فوراً بضغطة زر واحدة.
-          </p>
-        </div>
-      </div>
-      <button type="button" class="nav-btn primary" onclick="restoreFromLocalBackup()" style="background: linear-gradient(135deg, #1b9963, #127449); border: none; padding: 12px 26px; font-weight: 900; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(27, 153, 99, 0.3);">
-        🔄 استعادة منتجاتي الآن بنقرة واحدة
-      </button>
+    <!-- Silent Auto-Sync & Permanent Protection Badge -->
+    <div id="autoSyncStatusBadge" style="display: none; align-items: center; gap: 10px; background: rgba(5, 150, 105, 0.08); color: #047857; border: 1.5px solid rgba(16, 185, 129, 0.35); padding: 10px 20px; border-radius: 999px; font-weight: 800; font-size: 0.92rem; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(5, 150, 105, 0.06); width: fit-content;">
+      <span style="font-size: 1.1rem;">🟢</span>
+      <span id="autoSyncStatusText">جميع منتجاتك محفوظة ومحمية تلقائياً على هاتفك</span>
     </div>
 
     <!-- Navigation Tabs -->

@@ -111,16 +111,42 @@
     }
 
     async function loadStorefront() {
+      // First, render from local cache immediately for instant speed
+      try {
+        const cachedProds = localStorage.getItem('alreef_local_products') || localStorage.getItem('alreef_storefront_cache');
+        if (cachedProds) {
+          const parsed = JSON.parse(cachedProds);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            allProducts = parsed;
+            renderProducts();
+          }
+        }
+      } catch (e) {}
+
       try {
         const [settRes, catRes, prodRes] = await Promise.all([
-          fetch('/api/settings'),
-          fetch('/api/categories'),
-          fetch('/api/products?activeOnly=true')
+          fetch('/api/settings').catch(() => null),
+          fetch('/api/categories').catch(() => null),
+          fetch('/api/products?activeOnly=true').catch(() => null)
         ]);
 
-        storeSettings = await settRes.json();
-        const categories = await catRes.json();
-        allProducts = await prodRes.json();
+        if (settRes && settRes.ok) storeSettings = await settRes.json();
+        const categories = catRes && catRes.ok ? await catRes.json() : [];
+        let fetchedProducts = prodRes && prodRes.ok ? await prodRes.json() : [];
+
+        // If server had 0 products, but phone has cached products, silently restore
+        if (fetchedProducts.length === 0 && allProducts.length > 0) {
+          fetch('/api/products/bulk-restore', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ products: allProducts })
+          }).catch(() => {});
+        } else if (fetchedProducts.length > 0) {
+          allProducts = fetchedProducts;
+          try {
+            localStorage.setItem('alreef_storefront_cache', JSON.stringify(fetchedProducts));
+          } catch (e) {}
+        }
 
         // Update settings in UI
         if (storeSettings.storeName) {

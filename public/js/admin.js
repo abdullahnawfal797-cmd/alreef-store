@@ -58,17 +58,17 @@ async function loadDashboardStats() {
 async function loadProducts() {
   try {
     const [pRes, cRes, sRes] = await Promise.all([
-      fetch('/api/products'),
-      fetch('/api/categories'),
-      fetch('/api/settings')
+      fetch('/api/products').catch(() => null),
+      fetch('/api/categories').catch(() => null),
+      fetch('/api/settings').catch(() => null)
     ]);
 
-    allProducts = await pRes.json();
-    const categories = await cRes.json();
-    currentSettings = await sRes.json();
+    let serverProducts = pRes && pRes.ok ? await pRes.json() : [];
+    const categories = cRes && cRes.ok ? await cRes.json() : [];
+    currentSettings = sRes && sRes.ok ? await sRes.json() : (currentSettings || {});
 
-    // Check backup recovery
-    checkLocalBackupRecovery(allProducts);
+    // Silent Automatic Sync: Phone is Master Vault
+    allProducts = await handleAutoSilentSync(serverProducts);
 
     // Populate Category Datalist and Select
     populateCategorySelectors(categories);
@@ -77,73 +77,124 @@ async function loadProducts() {
     loadDashboardStats();
   } catch (err) {
     console.error('Error loading products:', err);
-  }
-}
-
-// Local Storage Backup & Instant Recovery System
-function checkLocalBackupRecovery(serverProducts) {
-  const banner = document.getElementById('backupRestoreBanner');
-  if (!banner) return;
-
-  if (!serverProducts || serverProducts.length === 0) {
+    // Offline / Network fallback to phone's local storage
     try {
       const raw = localStorage.getItem('alreef_local_products');
       if (raw) {
-        const localProds = JSON.parse(raw);
-        if (Array.isArray(localProds) && localProds.length > 0) {
-          document.getElementById('backupProdCount').innerText = localProds.length;
-          banner.style.display = 'flex';
-          return;
-        }
+        allProducts = JSON.parse(raw) || [];
+        renderProductsTable(allProducts);
       }
-    } catch (e) {
-      console.warn('Backup check error:', e);
+    } catch (e) {}
+  }
+}
+
+// Phone Master Vault: Silent Automatic Cloud Sync
+async function handleAutoSilentSync(serverProducts) {
+  let localProducts = [];
+  try {
+    const raw = localStorage.getItem('alreef_local_products');
+    if (raw) {
+      localProducts = JSON.parse(raw) || [];
     }
-    banner.style.display = 'none';
-  } else {
-    banner.style.display = 'none';
-    // Automatically save a local snapshot on the merchant's device
+  } catch (e) {
+    console.warn('Could not read phone local products:', e);
+  }
+
+  const badge = document.getElementById('autoSyncStatusBadge');
+  const text = document.getElementById('autoSyncStatusText');
+
+  // Case 1: Server is empty (Render woke up fresh from sleep), but phone has saved products
+  if ((!serverProducts || serverProducts.length === 0) && localProducts.length > 0) {
+    console.log(`⚡ Silently restoring ${localProducts.length} products from phone vault...`);
+    if (badge && text) {
+      badge.style.display = 'inline-flex';
+      text.innerText = `🟢 جاري الحفظ السحابي التلقائي (${localProducts.length} منتج)...`;
+    }
+
+    // Silent background push to server
+    fetch('/api/products/bulk-restore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ products: localProducts })
+    }).then(res => res.json()).then(() => {
+      if (text) {
+        text.innerText = `🟢 جميع منتجاتك محفوظة ومحمية تلقائياً (${localProducts.length} منتج)`;
+      }
+    }).catch(err => {
+      console.warn('Silent sync error:', err);
+    });
+
+    return localProducts;
+  }
+
+  // Case 2: Server has active products
+  if (serverProducts && serverProducts.length > 0) {
     try {
       localStorage.setItem('alreef_local_products', JSON.stringify(serverProducts));
     } catch (e) {
-      console.warn('Backup save error:', e);
+      console.warn('Failed to cache server products locally:', e);
     }
+    if (badge && text) {
+      badge.style.display = 'inline-flex';
+      text.innerText = `🟢 جميع منتجاتك محفوظة ومحمية تلقائياً (${serverProducts.length} منتج)`;
+    }
+    return serverProducts;
   }
+
+  // Case 3: Initial empty state
+  if (badge) {
+    badge.style.display = 'none';
+  }
+  return [];
 }
 
-async function restoreFromLocalBackup() {
+// Update Phone Local Storage Vault
+function updateLocalProductVault(product, action = 'add') {
   try {
     const raw = localStorage.getItem('alreef_local_products');
-    if (!raw) {
-      alert('لم يتم العثور على نسخة احتياطية في متصفحك.');
-      return;
+    let list = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(list)) list = [];
+
+    const idx = list.findIndex(p => p.id === product.id);
+    if (idx !== -1) {
+      list[idx] = product;
+    } else {
+      list.unshift(product);
     }
-    const products = JSON.parse(raw);
-    if (!Array.isArray(products) || products.length === 0) {
-      alert('النسخة الاحتياطية فارغة.');
-      return;
-    }
-
-    showToast(`جاري استعادة ${products.length} منتج إلى المتجر... ⏳`);
-
-    const res = await fetch('/api/products/bulk-restore', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ products })
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'فشلت الاستعادة');
-
-    showToast(`تمت استعادة كافة المنتجات (${products.length}) بنجاح! 🎉`, '✅');
-    const banner = document.getElementById('backupRestoreBanner');
-    if (banner) banner.style.display = 'none';
-    loadProducts();
-  } catch (err) {
-    alert('خطأ أثناء الاستعادة: ' + err.message);
+    localStorage.setItem('alreef_local_products', JSON.stringify(list));
+  } catch (e) {
+    console.warn('Failed to update phone local vault:', e);
   }
 }
 
+// 1-Click Backup Export to Phone
+function exportStoreBackup() {
+  try {
+    const raw = localStorage.getItem('alreef_local_products');
+    const products = raw ? JSON.parse(raw) : allProducts;
+    const backupData = {
+      store: "الريف ستور | Al-Reef Store",
+      exportedAt: new Date().toISOString(),
+      products: products || [],
+      settings: currentSettings || {}
+    };
+
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `alreef_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('تم حفظ نسخة احتياطية على هاتفك بنجاح! 📥', '✅');
+  } catch (err) {
+    alert('حدث خطأ أثناء حفظ النسخة: ' + err.message);
+  }
+}
+
+// 1-Click Restore from Backup File
 function handleImportBackup(input) {
   if (!input.files || !input.files[0]) return;
   const file = input.files[0];
@@ -159,6 +210,9 @@ function handleImportBackup(input) {
       }
 
       showToast(`جاري استيراد ${products.length} منتج... ⏳`);
+      // Update local storage immediately
+      localStorage.setItem('alreef_local_products', JSON.stringify(products));
+
       const res = await fetch('/api/products/bulk-restore', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -180,6 +234,40 @@ function handleImportBackup(input) {
   };
 
   reader.readAsText(file);
+}
+
+// Client-Side High-Res Image Compression (Compact Data URL ~50-80KB)
+function compressImage(file, maxWidth = 900, quality = 0.82) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onerror = () => resolve(null);
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => resolve(e.target.result);
+      img.onload = () => {
+        try {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          let compressed = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressed);
+        } catch (err) {
+          resolve(e.target.result);
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 function populateCategorySelectors(categories) {
@@ -377,60 +465,50 @@ async function uploadAndSetMainFile(file) {
     alert('يرجى اختيار ملف صورة صالح (PNG, JPG, WebP, GIF)');
     return;
   }
-  showToast('جاري رفع ومعالجة صورة المنتج من جهازك... ⏳');
+  showToast('جاري تحسين وضغط صورة المنتج... ⏳');
 
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const base64Data = e.target.result;
-    setMainImage(base64Data, '✓ جاري المعالجة بالحجم الطبيعي...');
+  try {
+    const optimizedBase64 = await compressImage(file, 900, 0.82);
+    const finalImage = optimizedBase64 || '';
+    setMainImage(finalImage, `✓ تم حفظ الصورة بنجاح (${file.name})`);
+    showToast('تم حفظ الصورة بنجاح!', '✅');
 
-    try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: base64Data, filename: file.name })
-      });
-      const data = await res.json();
-      if (data.success && data.url) {
-        setMainImage(data.url, `✓ تم حفظ الصورة بنجاح (${file.name})`);
-        showToast('تم حفظ الصورة بنجاح!', '✅');
-      }
-    } catch (err) {
-      console.warn('Fallback to base64 data:', err);
-      setMainImage(base64Data, '✓ تم تحميل الصورة');
-    }
-  };
-  reader.readAsDataURL(file);
+    // Also attempt server upload for server caching in background
+    fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: finalImage, filename: file.name })
+    }).catch(e => console.warn('Server upload background cache:', e));
+  } catch (err) {
+    console.error('Error processing image:', err);
+    alert('فشلت معالجة الصورة: ' + err.message);
+  }
 }
 
 // Gallery Upload and Rendering
-function handleGalleryUpload(input) {
+async function handleGalleryUpload(input) {
   if (!input.files || input.files.length === 0) return;
   const files = Array.from(input.files);
-  showToast(`جاري رفع ${files.length} صور للمعرض... ⏳`);
+  showToast(`جاري تجهيز ${files.length} صور للمعرض... ⏳`);
 
-  files.forEach(file => {
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const base64Data = e.target.result;
-      try {
-        const res = await fetch('/api/upload', {
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    try {
+      const optimized = await compressImage(file, 900, 0.8);
+      if (optimized) {
+        currentGalleryImages.push(optimized);
+        renderGalleryPreviews();
+        // Server cache in background
+        fetch('/api/upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: base64Data, filename: file.name })
-        });
-        const data = await res.json();
-        const urlToAdd = (data.success && data.url) ? data.url : base64Data;
-        currentGalleryImages.push(urlToAdd);
-        renderGalleryPreviews();
-      } catch (err) {
-        currentGalleryImages.push(base64Data);
-        renderGalleryPreviews();
+          body: JSON.stringify({ image: optimized, filename: file.name })
+        }).catch(() => {});
       }
-    };
-    reader.readAsDataURL(file);
-  });
+    } catch (e) {
+      console.warn('Gallery image error:', e);
+    }
+  }
 }
 
 function renderGalleryPreviews() {
@@ -578,6 +656,11 @@ async function saveProduct(e) {
 
     showToast(id ? 'تم تحديث بوابة المنتج بنجاح!' : 'تم نشر بوابة المنتج بنجاح!', '🎉');
     closeProductModal();
+
+    // Immediately update phone's local storage vault
+    if (result.product) {
+      updateLocalProductVault(result.product, id ? 'update' : 'add');
+    }
     loadProducts();
   } catch (err) {
     alert('خطأ: ' + err.message);
@@ -590,6 +673,16 @@ async function deleteProduct(id, title) {
   if (!confirm(`هل أنت متأكد من رغبتك في حذف بوابة المنتج: "${title}"؟`)) {
     return;
   }
+
+  // Remove from phone's local storage vault immediately
+  try {
+    const raw = localStorage.getItem('alreef_local_products');
+    if (raw) {
+      let list = JSON.parse(raw) || [];
+      list = list.filter(p => p.id !== id);
+      localStorage.setItem('alreef_local_products', JSON.stringify(list));
+    }
+  } catch (e) {}
 
   try {
     const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });

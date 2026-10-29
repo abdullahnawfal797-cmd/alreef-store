@@ -23,23 +23,42 @@ async function loadLandingPage() {
   const identifier = getProductIdentifier();
   try {
     const res = await fetch(`/api/products/${encodeURIComponent(identifier)}`);
-    if (!res.ok) {
-      document.body.innerHTML = `
-        <div style="text-align: center; padding: 80px 20px; font-family: 'Cairo', sans-serif;">
-          <h2 style="color: #e11d48; margin-bottom: 12px; font-weight: 900;">عذراً، هذا المنتج غير متوفر أو تم حذفه</h2>
-          <p style="color: #64748b; margin-bottom: 24px; font-weight: 600;">يرجى مراجعة الرابط أو العودة لصفحة البداية</p>
-          <a href="/" style="display: inline-block; padding: 14px 28px; background: #4f46e5; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 800;">العودة للمتجر الرئيسي</a>
-        </div>
-      `;
+    if (res.ok) {
+      const data = await res.json();
+      currentProduct = data.product;
+      currentSettings = data.settings || {};
+      renderProductUI();
+      initCountdownTimer();
       return;
     }
 
-    const data = await res.json();
-    currentProduct = data.product;
-    currentSettings = data.settings || {};
+    // Fallback: Check phone local storage cache
+    const raw = localStorage.getItem('alreef_local_products') || localStorage.getItem('alreef_storefront_cache');
+    if (raw) {
+      const list = JSON.parse(raw);
+      const found = Array.isArray(list) ? list.find(p => p.id === identifier || p.slug === identifier) : null;
+      if (found) {
+        currentProduct = found;
+        currentSettings = { storeName: 'الريف ستور | Al-Reef Store', currency: 'د.ع' };
+        renderProductUI();
+        initCountdownTimer();
+        // Silently restore server in background
+        fetch('/api/products/bulk-restore', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ products: list })
+        }).catch(() => {});
+        return;
+      }
+    }
 
-    renderProductUI();
-    initCountdownTimer();
+    document.body.innerHTML = `
+      <div style="text-align: center; padding: 80px 20px; font-family: 'Cairo', sans-serif;">
+        <h2 style="color: #e11d48; margin-bottom: 12px; font-weight: 900;">عذراً، هذا المنتج غير متوفر أو تم حذفه</h2>
+        <p style="color: #64748b; margin-bottom: 24px; font-weight: 600;">يرجى مراجعة الرابط أو العودة لصفحة البداية</p>
+        <a href="/" style="display: inline-block; padding: 14px 28px; background: #4f46e5; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 800;">العودة للمتجر الرئيسي</a>
+      </div>
+    `;
   } catch (err) {
     console.error('Error loading product:', err);
   }

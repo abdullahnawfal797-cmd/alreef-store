@@ -580,6 +580,11 @@ app.get('/api/backup/export', (req, res) => {
   res.send(JSON.stringify(safeData, null, 2));
 });
 
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Fallback to Storefront
 app.get('/', (req, res) => {
   res.sendFile('index.html', { root: path.join(__dirname, 'public') });
