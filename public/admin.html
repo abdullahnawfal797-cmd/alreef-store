@@ -73,6 +73,24 @@
       </div>
     </div>
 
+    <!-- SMART LOCAL BACKUP RECOVERY BANNER -->
+    <div id="backupRestoreBanner" style="display: none; background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px solid #dfa841; padding: 18px 24px; border-radius: 20px; margin-bottom: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; box-shadow: 0 10px 25px rgba(223, 168, 65, 0.15);">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span style="font-size: 2.2rem;">🛡️</span>
+        <div>
+          <strong style="color: #0c2340; font-size: 1.05rem; display: block; margin-bottom: 4px;">
+            تنبيه ذكي: وجدنا نسخة احتياطية من منتجاتك السابقة محفوظة في متصفحك (<span id="backupProdCount">0</span> منتج)!
+          </strong>
+          <p style="color: #475569; font-size: 0.88rem; line-height: 1.5; margin: 0;">
+            إذا اختفت المنتجات بسبب إعادة تشغيل سيرفر الاستضافة المجاني، يمكنك إعادتها إلى المتجر فوراً بضغطة زر واحدة.
+          </p>
+        </div>
+      </div>
+      <button type="button" class="nav-btn primary" onclick="restoreFromLocalBackup()" style="background: linear-gradient(135deg, #1b9963, #127449); border: none; padding: 12px 26px; font-weight: 900; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(27, 153, 99, 0.3);">
+        🔄 استعادة منتجاتي الآن بنقرة واحدة
+      </button>
+    </div>
+
     <!-- Navigation Tabs -->
     <div class="tabs-nav">
       <button class="tab-btn active" onclick="switchTab('productsTab', this)">
@@ -201,6 +219,38 @@
             حفظ التعديلات 💾
           </button>
         </form>
+      </div>
+
+      <!-- Cloud Database & Backup Management Card -->
+      <div style="max-width: 650px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 28px; margin-top: 24px;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 12px; color: #0c2340; display: flex; align-items: center; gap: 8px;">
+          <span>💾</span>
+          <span>النسخ الاحتياطي وقاعدة البيانات الدائمة</span>
+        </h3>
+        <p style="color: #64748b; font-size: 0.88rem; margin-bottom: 20px; line-height: 1.6;">
+          احتفظ بنسخة من جميع منتجاتك على هاتفك، أو اربط المتجر بقاعدة بيانات ريندر المجانية (PostgreSQL) لضمان عدم حذف أي بيانات نهائياً عند نوم السيرفر.
+        </p>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+          <a href="/api/backup/export" class="nav-btn primary" style="background: #0c2340; color: #dfa841; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+            <span>📥</span>
+            <span>تنزيل نسخة احتياطية على هاتفك (JSON)</span>
+          </a>
+
+          <label class="nav-btn outline" style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+            <span>📤</span>
+            <span>استيراد نسخة سابقة من هاتفك</span>
+            <input type="file" id="importBackupFile" accept=".json" style="display: none;" onchange="handleImportBackup(this)">
+          </label>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 14px; padding: 14px 18px; font-size: 0.85rem; color: #334155; line-height: 1.6;">
+          💡 <strong>لجعل البيانات دائمة بنسبة 100% ولا تُحذف أبداً في Render:</strong>
+          <br>
+          1. في موقع Render.com اضغط على <strong>New +</strong> ثم اختر <strong>PostgreSQL</strong> مجاناً.
+          <br>
+          2. انسخ الرابط الداخلي <code>Internal Database URL</code> وضعه كمتغير باسم <code>DATABASE_URL</code> في إعدادات متجرك على Render.
+        </div>
       </div>
     </div>
 

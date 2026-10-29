@@ -21,8 +21,25 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Database helper functions
-function readData() {
+// PostgreSQL Persistent Database Adapter (Render Postgres / Cloud Database)
+const { Pool } = require('pg');
+
+let pool = null;
+if (process.env.DATABASE_URL) {
+  try {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
+    });
+    console.log('🔗 PostgreSQL Pool initialized from DATABASE_URL.');
+  } catch (err) {
+    console.error('Failed to initialize PostgreSQL pool:', err);
+  }
+}
+
+let cachedData = null;
+
+function readDataFromFile() {
   try {
     if (!fs.existsSync(DATA_FILE)) {
       return { settings: {}, categories: [], products: [], orders: [] };
@@ -35,13 +52,72 @@ function readData() {
   }
 }
 
+// Database helper functions (Synchronous in-memory reads for zero-latency)
+function readData() {
+  if (cachedData) {
+    return cachedData;
+  }
+  cachedData = readDataFromFile();
+  return cachedData;
+}
+
 function writeData(data) {
   try {
+    cachedData = data;
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+
+    // Asynchronously persist to PostgreSQL if connected
+    if (pool) {
+      pool.query(
+        `INSERT INTO alreef_store (id, data, updated_at)
+         VALUES ('main_data', $1, NOW())
+         ON CONFLICT (id) DO UPDATE SET data = $1, updated_at = NOW()`,
+        [JSON.stringify(data)]
+      ).catch(err => {
+        console.error('⚠️ Failed to sync data to PostgreSQL:', err.message);
+      });
+    }
     return true;
   } catch (err) {
     console.error('Error writing data:', err);
     return false;
+  }
+}
+
+// Initialize and sync database on startup
+async function initDatabase() {
+  if (!pool) {
+    console.log('ℹ️ Running in local file storage mode (data/store.json).');
+    return;
+  }
+
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS alreef_store (
+        id VARCHAR(50) PRIMARY KEY,
+        data JSONB NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('✅ PostgreSQL table alreef_store verified.');
+
+    const res = await pool.query(`SELECT data FROM alreef_store WHERE id = 'main_data'`);
+    if (res.rows && res.rows.length > 0 && res.rows[0].data) {
+      cachedData = res.rows[0].data;
+      fs.writeFileSync(DATA_FILE, JSON.stringify(cachedData, null, 2), 'utf8');
+      console.log(`✅ Loaded ${cachedData.products?.length || 0} products & ${cachedData.orders?.length || 0} orders from persistent PostgreSQL.`);
+    } else {
+      console.log('ℹ️ No existing PostgreSQL data found. Seeding from local file...');
+      const initial = readDataFromFile();
+      await pool.query(
+        `INSERT INTO alreef_store (id, data) VALUES ('main_data', $1) ON CONFLICT (id) DO UPDATE SET data = $1`,
+        [JSON.stringify(initial)]
+      );
+      cachedData = initial;
+      console.log('✅ Initial seed saved to PostgreSQL.');
+    }
+  } catch (err) {
+    console.error('⚠️ PostgreSQL connection failed on startup:', err.message);
   }
 }
 
@@ -468,17 +544,53 @@ app.get('/admin', (req, res) => {
   res.sendFile('admin.html', { root: path.join(__dirname, 'public') });
 });
 
+// Bulk Restore / Client Backup Sync Endpoint
+app.post('/api/products/bulk-restore', (req, res) => {
+  try {
+    const { products, categories, settings } = req.body;
+    if (!products || !Array.isArray(products)) {
+      return res.status(400).json({ error: 'صيغة بيانات المنتجات غير صحيحة' });
+    }
+    const data = readData();
+    data.products = products;
+    if (categories && Array.isArray(categories)) {
+      data.categories = categories;
+    }
+    if (settings && typeof settings === 'object') {
+      data.settings = { ...data.settings, ...settings };
+    }
+    writeData(data);
+    res.json({ success: true, count: products.length, message: `تمت استعادة ${products.length} منتج بنجاح!` });
+  } catch (err) {
+    console.error('Bulk restore error:', err);
+    res.status(500).json({ error: 'فشل استعادة المنتجات: ' + err.message });
+  }
+});
+
+// Full Backup Export Endpoint
+app.get('/api/backup/export', (req, res) => {
+  const data = readData();
+  const safeData = {
+    ...data,
+    settings: { ...(data.settings || {}) }
+  };
+  delete safeData.settings.adminPassword;
+  res.setHeader('Content-Disposition', 'attachment; filename=alreef_store_backup.json');
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(safeData, null, 2));
+});
+
 // Fallback to Storefront
 app.get('/', (req, res) => {
   res.sendFile('index.html', { root: path.join(__dirname, 'public') });
 });
 
-// Start Server
-app.listen(PORT, () => {
+// Start Server & Initialize Database
+app.listen(PORT, async () => {
   console.log(`===============================================`);
   console.log(`🚀 Landing Hub Server Running on http://localhost:${PORT}`);
   console.log(`🛒 Storefront Catalog: http://localhost:${PORT}`);
   console.log(`⚙️  Admin Control Panel: http://localhost:${PORT}/admin`);
-  console.log(`🎯 Example Landing Page: http://localhost:${PORT}/p/smart-watch-ultra`);
   console.log(`===============================================`);
+  await initDatabase();
 });

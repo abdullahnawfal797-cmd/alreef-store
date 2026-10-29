@@ -67,6 +67,9 @@ async function loadProducts() {
     const categories = await cRes.json();
     currentSettings = await sRes.json();
 
+    // Check backup recovery
+    checkLocalBackupRecovery(allProducts);
+
     // Populate Category Datalist and Select
     populateCategorySelectors(categories);
 
@@ -75,6 +78,108 @@ async function loadProducts() {
   } catch (err) {
     console.error('Error loading products:', err);
   }
+}
+
+// Local Storage Backup & Instant Recovery System
+function checkLocalBackupRecovery(serverProducts) {
+  const banner = document.getElementById('backupRestoreBanner');
+  if (!banner) return;
+
+  if (!serverProducts || serverProducts.length === 0) {
+    try {
+      const raw = localStorage.getItem('alreef_local_products');
+      if (raw) {
+        const localProds = JSON.parse(raw);
+        if (Array.isArray(localProds) && localProds.length > 0) {
+          document.getElementById('backupProdCount').innerText = localProds.length;
+          banner.style.display = 'flex';
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Backup check error:', e);
+    }
+    banner.style.display = 'none';
+  } else {
+    banner.style.display = 'none';
+    // Automatically save a local snapshot on the merchant's device
+    try {
+      localStorage.setItem('alreef_local_products', JSON.stringify(serverProducts));
+    } catch (e) {
+      console.warn('Backup save error:', e);
+    }
+  }
+}
+
+async function restoreFromLocalBackup() {
+  try {
+    const raw = localStorage.getItem('alreef_local_products');
+    if (!raw) {
+      alert('لم يتم العثور على نسخة احتياطية في متصفحك.');
+      return;
+    }
+    const products = JSON.parse(raw);
+    if (!Array.isArray(products) || products.length === 0) {
+      alert('النسخة الاحتياطية فارغة.');
+      return;
+    }
+
+    showToast(`جاري استعادة ${products.length} منتج إلى المتجر... ⏳`);
+
+    const res = await fetch('/api/products/bulk-restore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ products })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'فشلت الاستعادة');
+
+    showToast(`تمت استعادة كافة المنتجات (${products.length}) بنجاح! 🎉`, '✅');
+    const banner = document.getElementById('backupRestoreBanner');
+    if (banner) banner.style.display = 'none';
+    loadProducts();
+  } catch (err) {
+    alert('خطأ أثناء الاستعادة: ' + err.message);
+  }
+}
+
+function handleImportBackup(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+
+  reader.onload = async (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const products = Array.isArray(data) ? data : data.products;
+      if (!Array.isArray(products) || products.length === 0) {
+        alert('الملف لا يحتوي على قائمة منتجات صالحة.');
+        return;
+      }
+
+      showToast(`جاري استيراد ${products.length} منتج... ⏳`);
+      const res = await fetch('/api/products/bulk-restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          products,
+          categories: data.categories,
+          settings: data.settings
+        })
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'فشل الاستيراد');
+
+      showToast(`تم استيراد ${products.length} منتج بنجاح!`, '🎉');
+      loadProducts();
+    } catch (err) {
+      alert('خطأ في قراءة ملف النسخة الاحتياطية: ' + err.message);
+    }
+  };
+
+  reader.readAsText(file);
 }
 
 function populateCategorySelectors(categories) {
